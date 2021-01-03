@@ -45,8 +45,9 @@ namespace ToDew {
         /// <summary>
         /// The data model used to send the ListData between mod instances in multiplayer.
         /// </summary>
-        /// Because SMAPI (at least as of 3.8.1) does not support deserializing an ISemanticVersion
+        /// Because SMAPI before 3.8.2 does not support deserializing an ISemanticVersion
         /// in the network code, even though it does in the save file code.
+        /// (see https://github.com/Pathoschild/SMAPI/issues/745)
         public class NetworkListData {
             public string DataFormatVersion { get; set; } = CurrentDataFormatVersion.ToString();
             public List<ListItem> Items { get; set; } = new List<ListItem>();

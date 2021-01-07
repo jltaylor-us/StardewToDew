@@ -11,6 +11,7 @@ namespace ToDew {
     /// <summary>The configuration data model.</summary>
     public class ModConfig {
         public SButton hotkey = SButton.L;
+        public SButton secondaryCloseButton = SButton.ControllerBack;
         public bool debug = false;
     }
     /// <summary>The To-Dew mod.</summary>
@@ -37,6 +38,7 @@ namespace ToDew {
             if (api != null) {
                 api.RegisterModConfig(ModManifest, () => config = new ModConfig(), () => Helper.WriteConfig(config));
                 api.RegisterSimpleOption(ModManifest, "Hotkey", "The key to bring up the to-do list", () => config.hotkey, (SButton val) => config.hotkey = val);
+                api.RegisterSimpleOption(ModManifest, "SecondaryCloseButton", "An alternate key (besides ESC) to close the to-do list", () => config.secondaryCloseButton, (SButton val) => config.secondaryCloseButton = val);
                 api.RegisterSimpleOption(ModManifest, "Debug", "Enable debugging output in the log", () => config.debug, (bool val) => config.debug = val);
             }
 
@@ -53,7 +55,7 @@ namespace ToDew {
                 originalTexture.GetData(0, sourceRectangle, data, 0, data.Length);
                 cropTexture.SetData(data);
 
-                phoneApi.AddApp(Helper.ModRegistry.ModID, "To-Dew", () => { Game1.activeClickableMenu = new ToDoMenu(this.Monitor, this.list); } , cropTexture);
+                phoneApi.AddApp(Helper.ModRegistry.ModID, "To-Dew", () => { Game1.activeClickableMenu = new ToDoMenu(this, this.list); } , cropTexture);
             }
         }
 
@@ -87,7 +89,7 @@ namespace ToDew {
                 && !this.list.IncompatibleMultiplayerHost) {
                 if (Game1.activeClickableMenu != null)
                     Game1.exitActiveMenu();
-                Game1.activeClickableMenu = new ToDoMenu(this.Monitor, this.list);
+                Game1.activeClickableMenu = new ToDoMenu(this, this.list);
             }
         }
     }

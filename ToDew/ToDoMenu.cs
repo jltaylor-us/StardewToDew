@@ -18,7 +18,7 @@ namespace ToDew {
         /// Rendering for an individual row in the to-do list.
         /// </summary>
         private class MenuItem : ClickableComponent {
-            internal const int MenuItemHeight = 60;
+            internal const int MenuItemHeight = 40;
             internal readonly ToDoList.ListItem todoItem;
             public MenuItem(ToDoList.ListItem todoItem)
                 : base(Rectangle.Empty, "ToDo: " + todoItem.Text) {
@@ -38,7 +38,7 @@ namespace ToDew {
                 this.bounds.Height = MenuItemHeight;
                 const int borderWidth = 2;
                 int leftMarginReserve = 70;
-                int topPadding = this.bounds.Height / 2;
+                int topPadding = this.bounds.Height / 5;
 
                 // draw
                 if (highlight)
@@ -51,7 +51,7 @@ namespace ToDew {
             }
         }
 
-        private readonly IMonitor Monitor;
+        private readonly ModEntry theMod;
         private readonly ToDoList theList;
         private List<MenuItem> menuItemList;
 
@@ -64,8 +64,8 @@ namespace ToDew {
         /// Set after adding an item because adding is asynchronous for farmhands.  Cleared on other actions.
         private bool forceScrollToBottom = false;
 
-        public ToDoMenu(IMonitor monitor, ToDoList theList) {
-            this.Monitor = monitor;
+        public ToDoMenu(ModEntry theMod, ToDoList theList) {
+            this.theMod = theMod;
             this.theList = theList;
 
             // update size
@@ -188,7 +188,7 @@ namespace ToDew {
         /// <param name="key">The pressed input.</param>
         public override void receiveKeyPress(Keys key) {
             // deliberately avoid calling base, which may let another key close the menu
-            if (key.Equals(Keys.Escape))
+            if (key.Equals(Keys.Escape) || this.theMod.config.secondaryCloseButton.Equals(key.ToSButton()))
                 this.exitThisMenu();
 
             if (key.Equals(Keys.Enter)) {
@@ -198,6 +198,14 @@ namespace ToDew {
                 //this.MaxScroll += MenuItem.MenuItemHeight;
                 //this.CurrentScroll = this.MaxScroll;
                 Game1.playSound("coin");
+            }
+        }
+
+        public override void receiveGamePadButton(Buttons b) {
+            if (this.theMod.config.secondaryCloseButton.Equals(b.ToSButton())) {
+                this.exitThisMenu();
+            } else {
+                base.receiveGamePadButton(b);
             }
         }
 

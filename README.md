@@ -75,3 +75,10 @@ If the host and a farmhand have different versions of To-Dew installed,
 the mod attempts to make intelligent decisions about what to do.  Look for
 messages in the SMAPI console log.  This scenario is probably not
 well-tested and may contain bugs.
+
+## Known Issues
+
+* The overlay will be partially (or fully) hidden by the black bars drawn
+  on the left and right sides of the screen on maps that are narrower than
+  the screen (which depends on the screen, but most likely e.g. is the bus
+  stop).

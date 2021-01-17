@@ -11,6 +11,13 @@
   of the long item.)  As part of this, change the highlight style from
   being a different background color to being a rectangular border instead.
 
+### Known Issue
+
+* The overlay will be partially (or fully) hidden by the black bars drawn
+  on the left and right sides of the screen on maps that are narrower than
+  the screen (which depends on the screen, but most likely e.g. is the bus
+  stop).
+
 ## Version 1.2.0
 
 * Tighten up the spacing between items in the list

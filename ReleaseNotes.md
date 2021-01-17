@@ -6,6 +6,11 @@
 * Add an overlay that displays the list all the time (when enabled
   in the configuration).
 
+* Fix rendering of long items.  (More specifically, fix the rendering
+  of the subsequent items so they don't overlap the additional line(s)
+  of the long item.)  As part of this, change the highlight style from
+  being a different background color to being a rectangular border instead.
+
 ## Version 1.2.0
 
 * Tighten up the spacing between items in the list

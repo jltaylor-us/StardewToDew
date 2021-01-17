@@ -18,12 +18,20 @@ namespace ToDew {
         /// Rendering for an individual row in the to-do list.
         /// </summary>
         private class MenuItem : ClickableComponent {
-            internal const int MenuItemHeight = 40;
+            internal const int MinMenuItemHeight = 40;
             internal readonly ToDoList.ListItem todoItem;
-            public MenuItem(ToDoList.ListItem todoItem)
+            internal readonly int myIndex;
+            internal readonly int totalItemCount;
+            public MenuItem(ToDoList.ListItem todoItem, int index, int totalItemCount)
                 : base(Rectangle.Empty, "ToDo: " + todoItem.Text) {
                 this.todoItem = todoItem;
+                this.myIndex = index;
+                this.totalItemCount = totalItemCount;
             }
+
+            public bool IsFirstItem { get => myIndex == 0; }
+            public bool IsLastItem { get => myIndex == totalItemCount - 1; }
+
             /// <summary>Draw the ToDo List item to the screen.</summary>
             /// <param name="spriteBatch">The sprite batch being drawn.</param>
             /// <param name="positionX">The X position at which to draw the item.</param>
@@ -35,16 +43,26 @@ namespace ToDew {
                 this.bounds.X = positionX;
                 this.bounds.Y = positionY;
                 this.bounds.Width = width;
-                this.bounds.Height = MenuItemHeight;
                 const int borderWidth = 2;
                 int leftMarginReserve = 70;
-                int topPadding = this.bounds.Height / 5;
+                int topPadding = 5;
+                Color highlightBorderColor = Color.Black;
 
                 // draw
-                if (highlight)
-                    spriteBatch.DrawLine(this.bounds.X, this.bounds.Y, new Vector2(this.bounds.Width, this.bounds.Height), Color.Beige);
+                var textSize = spriteBatch.DrawTextBlock(Game1.smallFont, todoItem.Text, new Vector2(this.bounds.X, this.bounds.Y) + new Vector2(leftMarginReserve, topPadding), this.bounds.Width - leftMarginReserve); // text
+                this.bounds.Height = Math.Max(MinMenuItemHeight, topPadding + (int)textSize.Y);
+                if (highlight) {
+                    spriteBatch.DrawLine(this.bounds.X, this.bounds.Y + borderWidth, new Vector2(this.bounds.Width, borderWidth), highlightBorderColor);
+                    spriteBatch.DrawLine(this.bounds.X, this.bounds.Y + this.bounds.Height - borderWidth, new Vector2(this.bounds.Width, borderWidth), highlightBorderColor);
+                    spriteBatch.DrawLine(this.bounds.X, this.bounds.Y, new Vector2(borderWidth * 2, this.bounds.Height), highlightBorderColor);
+                    spriteBatch.DrawLine(this.bounds.X + this.bounds.Width - borderWidth * 2, this.bounds.Y, new Vector2(borderWidth * 2, this.bounds.Height), highlightBorderColor);
+                    if (IsLastItem) {
+                        // there is no item below us to draw a border, so let's do it ourselves so the highlight box doesn't look weird
+                        spriteBatch.DrawLine(this.bounds.X, this.bounds.Y + this.bounds.Height, new Vector2(this.bounds.Width, borderWidth), Color.Black); // border
+                        this.bounds.Height += borderWidth;
+                    }
+                }
                 spriteBatch.DrawLine(this.bounds.X, this.bounds.Y, new Vector2(this.bounds.Width, borderWidth), Color.Black); // border
-                spriteBatch.DrawTextBlock(Game1.smallFont, todoItem.Text, new Vector2(this.bounds.X, this.bounds.Y) + new Vector2(leftMarginReserve, topPadding), this.bounds.Width - leftMarginReserve); // text
 
                 // return size
                 return new Vector2(this.bounds.Width, this.bounds.Height);
@@ -88,9 +106,11 @@ namespace ToDew {
         }
 
         private void syncMenuItemList() {
-            menuItemList = new List<MenuItem>(theList.Items.Count);
-            foreach (ToDoList.ListItem item in theList.Items) {
-                menuItemList.Add(new MenuItem(item));
+            var items = theList.Items;
+            var itemCount = items.Count;
+            menuItemList = new List<MenuItem>(itemCount);
+            for (int i = 0; i < itemCount; i++) {
+                menuItemList.Add(new MenuItem(items[i], i, itemCount));
             }
         }
 

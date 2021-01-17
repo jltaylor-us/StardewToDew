@@ -32,11 +32,15 @@ Press escape to close the list.
 List data is saved in the game save file, so any changes since the last
 save will be lost when you exit.
 
+The list is also displayed in an overlay in the top left corner during game
+play.  This can be disabled in the configuration.
+
 ## Configuration
 
 When SMAPI runs the mod for the first time it will create a `config.json`
 in the mod directory.  You can edit this file to configure the hotkey for
-opening the to-do list.
+opening the to-do list and for various properties of the overlay (including
+whether it is enabled at all).
 
 If [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 is installed then there will be an entry for To-Dew in the in-game config
@@ -48,6 +52,10 @@ menu.
 Works with Stardew Valley 1.5 / SMAPI 3.8, single and multiplayer (but see
 further notes on Multiplayer below).  No known incompatibilities with
 other mods.
+
+I have no idea what things do or do not work with split-screen.  As
+far as I can tell you have to have controllers to even start split-screen,
+and I don't.
 
 
 ## Multiplayer Support

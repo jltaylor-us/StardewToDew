@@ -13,12 +13,14 @@ namespace ToDew {
         public SButton hotkey = SButton.L;
         public SButton secondaryCloseButton = SButton.ControllerBack;
         public bool debug = false;
+        public OverlayConfig overlay = new OverlayConfig();
     }
     /// <summary>The To-Dew mod.</summary>
     /// Encapsulates the game lifecycle events and orchestrates the UI (ToDoMenu) data
     /// model (ToDoList) bits.
     public class ModEntry : Mod {
         private ToDoList list;
+        private ToDoOverlay overlay;
         internal ModConfig config;
 
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
@@ -29,6 +31,7 @@ namespace ToDew {
             helper.Events.Multiplayer.PeerConnected += this.OnPeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
             helper.Events.GameLoop.GameLaunched += onLaunched;
+            helper.Events.GameLoop.ReturnedToTitle += this.OnReturnedToTitle;
             this.config = helper.ReadConfig<ModConfig>();
         }
 
@@ -38,8 +41,9 @@ namespace ToDew {
             if (api != null) {
                 api.RegisterModConfig(ModManifest, () => config = new ModConfig(), () => Helper.WriteConfig(config));
                 api.RegisterSimpleOption(ModManifest, "Hotkey", "The key to bring up the to-do list", () => config.hotkey, (SButton val) => config.hotkey = val);
-                api.RegisterSimpleOption(ModManifest, "SecondaryCloseButton", "An alternate key (besides ESC) to close the to-do list", () => config.secondaryCloseButton, (SButton val) => config.secondaryCloseButton = val);
+                api.RegisterSimpleOption(ModManifest, "Secondary Close Button", "An alternate key (besides ESC) to close the to-do list", () => config.secondaryCloseButton, (SButton val) => config.secondaryCloseButton = val);
                 api.RegisterSimpleOption(ModManifest, "Debug", "Enable debugging output in the log", () => config.debug, (bool val) => config.debug = val);
+                config.overlay.RegisterConfigMenuOptions(api, ModManifest);
             }
 
             // integrate with MobilePhone, if installed
@@ -64,7 +68,7 @@ namespace ToDew {
                 Monitor.Log($"Received mod message {e.Type} from {e.FromModID}", LogLevel.Debug);
             }
             if (e.FromModID.Equals(this.ModManifest.UniqueID)) {
-                list.ReceiveModMessage(e);
+                list?.ReceiveModMessage(e);
             }
         }
 
@@ -80,12 +84,22 @@ namespace ToDew {
                 this.Monitor.Log($"My multiplayer ID: {Game1.player.UniqueMultiplayerID}", LogLevel.Debug);
             }
             list = new ToDoList(this);
+            if (config.overlay.enabled) {
+                overlay = new ToDoOverlay(this, list);
+            }
+        }
+
+        private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e) {
+            list = null;
+            overlay?.Dispose();
+            overlay = null;
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
             if (Context.IsWorldReady
                 && Context.IsPlayerFree
                 && e.Button == this.config.hotkey
+                && list != null
                 && !this.list.IncompatibleMultiplayerHost) {
                 if (Game1.activeClickableMenu != null)
                     Game1.exitActiveMenu();
@@ -96,8 +110,10 @@ namespace ToDew {
     // See https://github.com/spacechase0/GenericModConfigMenu/blob/master/Api.cs for full API
     public interface GenericModConfigMenuAPI {
         void RegisterModConfig(IManifest mod, Action revertToDefault, Action saveToFile);
+        void RegisterLabel(IManifest mod, string labelName, string labelDesc);
         void RegisterSimpleOption(IManifest mod, string optionName, string optionDesc, Func<bool> optionGet, Action<bool> optionSet);
         void RegisterSimpleOption(IManifest mod, string optionName, string optionDesc, Func<SButton> optionGet, Action<SButton> optionSet);
+        void RegisterSimpleOption(IManifest mod, string optionName, string optionDesc, Func<int> optionGet, Action<int> optionSet);
     }
     // See https://www.nexusmods.com/stardewvalley/articles/467
     public interface IMobilePhoneApi {

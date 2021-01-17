@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 1.3.0
+
+* Add an overlay that displays the list all the time (when enabled
+  in the configuration).
+
 ## Version 1.2.0
 
 * Tighten up the spacing between items in the list

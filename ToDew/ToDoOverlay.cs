@@ -94,9 +94,15 @@ namespace ToDew {
             if (lines.Count == 0) return;
             if (!config.enabled) return; // shouldn't get this far, but why not check anyway
             var spriteBatch = e.SpriteBatch;
-            spriteBatch.Draw(Game1.fadeToBlackRect, bounds, config.backgroundColor);
-            Utility.drawBoldText(spriteBatch, ListHeader, font, new Vector2(marginLeft, marginTop), config.textColor);
-            float topPx = marginTop + ListHeaderSize.Y;
+            float topPx = marginTop;
+            Rectangle effectiveBounds = bounds;
+            if (Game1.CurrentMineLevel > 0) {
+                topPx += 80;
+                effectiveBounds.Y += 80;
+            }
+            spriteBatch.Draw(Game1.fadeToBlackRect, effectiveBounds, config.backgroundColor);
+            Utility.drawBoldText(spriteBatch, ListHeader, font, new Vector2(marginLeft, topPx), config.textColor);
+            topPx += ListHeaderSize.Y;
             spriteBatch.DrawLine(marginLeft, topPx, new Vector2(ListHeaderSize.X - 3, 1), config.textColor);
             for (int i = 0; i < lines.Count; i++) {
                 topPx += lineSpacing;

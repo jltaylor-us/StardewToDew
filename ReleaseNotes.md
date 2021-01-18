@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.3.1
+
+* Move overlay below the mine level indicator when in mines.
+
 ## Version 1.3.0
 
 * Add an overlay that displays the list all the time (when enabled

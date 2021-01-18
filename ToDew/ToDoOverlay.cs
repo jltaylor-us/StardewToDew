@@ -10,15 +10,17 @@ using StardewValley;
 namespace ToDew {
     public class OverlayConfig {
         public bool enabled = true;
+        public SButton hotkey = SButton.None;
         public int maxWidth = 600;
         public int maxItems = 10;
         public Color backgroundColor = Color.Black * 0.2f;
         public Color textColor = Color.White * 0.8f;
-        public void RegisterConfigMenuOptions(GenericModConfigMenuAPI api, IManifest modManifest) {
+        public static void RegisterConfigMenuOptions(Func<OverlayConfig> getThis, GenericModConfigMenuAPI api, IManifest modManifest) {
             api.RegisterLabel(modManifest, "Overlay", "Configure the always-on overlay showing the list");
-            api.RegisterSimpleOption(modManifest, "Enabled", "Is the overlay enabled?", () => this.enabled, (bool val) => this.enabled = val);
-            api.RegisterSimpleOption(modManifest, "Max Width", "Maximum width of the overlay in pixels", () => this.maxWidth, (int val) => this.maxWidth = val);
-            api.RegisterSimpleOption(modManifest, "Max Items", "Maximum number of items to show in the overlay", () => this.maxItems, (int val) => this.maxItems = val);
+            api.RegisterSimpleOption(modManifest, "Enabled", "Is the overlay enabled?", () => getThis().enabled, (bool val) => getThis().enabled = val);
+            api.RegisterSimpleOption(modManifest, "Hotkey", "Hotkey to show or hide", () => getThis().hotkey, (SButton val) => getThis().hotkey = val);
+            api.RegisterSimpleOption(modManifest, "Max Width", "Maximum width of the overlay in pixels", () => getThis().maxWidth, (int val) => getThis().maxWidth = val);
+            api.RegisterSimpleOption(modManifest, "Max Items", "Maximum number of items to show in the overlay", () => getThis().maxItems, (int val) => getThis().maxItems = val);
         }
     }
     public class ToDoOverlay : IDisposable {

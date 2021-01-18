@@ -43,7 +43,7 @@ namespace ToDew {
                 api.RegisterSimpleOption(ModManifest, "Hotkey", "The key to bring up the to-do list", () => config.hotkey, (SButton val) => config.hotkey = val);
                 api.RegisterSimpleOption(ModManifest, "Secondary Close Button", "An alternate key (besides ESC) to close the to-do list", () => config.secondaryCloseButton, (SButton val) => config.secondaryCloseButton = val);
                 api.RegisterSimpleOption(ModManifest, "Debug", "Enable debugging output in the log", () => config.debug, (bool val) => config.debug = val);
-                config.overlay.RegisterConfigMenuOptions(api, ModManifest);
+                OverlayConfig.RegisterConfigMenuOptions(() => config.overlay, api, ModManifest);
             }
 
             // integrate with MobilePhone, if installed
@@ -98,12 +98,22 @@ namespace ToDew {
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
             if (Context.IsWorldReady
                 && Context.IsPlayerFree
-                && e.Button == this.config.hotkey
                 && list != null
                 && !this.list.IncompatibleMultiplayerHost) {
-                if (Game1.activeClickableMenu != null)
-                    Game1.exitActiveMenu();
-                Game1.activeClickableMenu = new ToDoMenu(this, this.list);
+
+                if (e.Button == this.config.hotkey) {
+                    if (Game1.activeClickableMenu != null)
+                        Game1.exitActiveMenu();
+                    Game1.activeClickableMenu = new ToDoMenu(this, this.list);
+                }
+                if (e.Button == this.config.overlay.hotkey) {
+                    if (overlay == null && config.overlay.enabled) {
+                        overlay = new ToDoOverlay(this, list);
+                    } else {
+                        overlay.Dispose();
+                        overlay = null;
+                    }
+                }
             }
         }
     }

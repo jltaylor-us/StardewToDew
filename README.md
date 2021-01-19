@@ -19,6 +19,21 @@ Follow the usual installation proceedure for SMAPI mods:
 Bring up the to-do list by pressing the configurable hotkey (default `L`
 for "**l**ist").
 
+Edit your list.  See "List Editing" below for more information on editing.
+
+Press escape to close the list.
+
+List data is saved in the game save file, so any changes since the last
+save will be lost when you exit.
+
+The list is also displayed in an overlay in the top left corner during game
+play.  This can be disabled in the configuration.  When the overlay is enabled,
+its visibility can be toggled with a hotkey, if you configure the hotkey.
+(By default, the hotkey is not configured.  Or to be pedantic, configured
+to `None`, which matches no buttons or keys.)
+
+### List Editing
+
 Enter text in the textbox.  Press enter to add it to the list.
 
 Use the scroll gesture on your mouse or trackpad to scroll the list if it
@@ -27,13 +42,13 @@ that there are more items.)
 
 Click a list item to remove it from the list.
 
-Press escape to close the list.
+Use the small up and down arrows to the right of items to reorder them.
 
-List data is saved in the game save file, so any changes since the last
-save will be lost when you exit.
-
-The list is also displayed in an overlay in the top left corner during game
-play.  This can be disabled in the configuration.
+Right-clicking on an item will copy its text to the textbox (replacing
+whatever is there).  The textbox implementation is from the base game,
+and as far as I can tell you can only add or remove characters from the
+end.  If you see any open-source mods that have more advanced text editing
+capabilities then let me know and I'll take a look to see how they're done.
 
 ## Configuration
 

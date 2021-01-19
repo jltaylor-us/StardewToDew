@@ -1,6 +1,21 @@
 
 # Release Notes
 
+## Version 1.4.0
+
+* Items can now be reordered.
+
+* Right-clicking on an item will copy its text to the textbox (replacing
+  whatever is currently there).
+
+* When the overlay is enabled, its visibility can be toggled with a
+  hotkey, if so configured.  The default configuration does not have
+  a hotkey for the overlay.
+
+* Fixed a bug with the Generic Mod Config integration that would result
+  in the overlay portion of the configuration getting "de-synced" after
+  resetting to defaults (until game restart).
+
 ## Version 1.3.1
 
 * Move overlay below the mine level indicator when in mines.

@@ -309,6 +309,20 @@ namespace ToDew {
             }
         }
 
+        /// <summary>The method invoked when the player right-clicks on the menu UI.</summary>
+        /// <param name="x">The X-position of the cursor.</param>
+        /// <param name="y">The Y-position of the cursor.</param>
+        /// <param name="playSound">Whether to enable sound.</param>
+        public override void receiveRightClick(int x, int y, bool playSound = true) {
+            this.forceScrollToBottom = false;
+            foreach (MenuItem match in this.menuItemList) {
+                if (match.containsPoint(x, y)) {
+                    this.Textbox.Text = match.todoItem.Text;
+                    return;
+                }
+            }
+        }
+
         private void OnListChanged(object sender, List<ToDoList.ListItem> e) {
             syncMenuItemList();
         }

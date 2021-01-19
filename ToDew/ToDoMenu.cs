@@ -85,18 +85,12 @@ namespace ToDew {
                 spriteBatch.DrawLine(this.bounds.X, this.bounds.Y, new Vector2(this.bounds.Width, borderWidth), Color.Black); // border
                 if (!IsFirstItem) {
                     bool highlight = upArrowBounds.Contains(mouseX, MouseY);
-                    spriteBatch.Draw(Game1.mouseCursors,
-                        position: new Vector2(upArrowBounds.X, upArrowBounds.Y),
-                        sourceRectangle: smallUpArrow,
-                        scale: new Vector2(highlight ? 1.2f : 1.0f));
+                    spriteBatch.DrawSprite(Game1.mouseCursors, smallUpArrow, upArrowBounds.X, upArrowBounds.Y, null, highlight ? 1.2f : 1.0f);
                     mouseInButton |= highlight;
                 }
                 if (!IsLastItem) {
                     bool highlight = downArrowBounds.Contains(mouseX, MouseY);
-                    spriteBatch.Draw(Game1.mouseCursors,
-                        position: new Vector2(downArrowBounds.X, downArrowBounds.Y),
-                        sourceRectangle: smallDownArrow,
-                        scale: new Vector2(highlight ? 1.2f : 1.0f));
+                    spriteBatch.DrawSprite(Game1.mouseCursors, smallDownArrow, downArrowBounds.X, downArrowBounds.Y, null, highlight ? 1.2f : 1.0f);
                     mouseInButton |= highlight;
                 }
                 if (/* !mouseInButton &&*/ this.containsPoint(mouseX, MouseY)) {

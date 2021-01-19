@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 1.4.2
+
+* Fix crash with `MissingMethodException` for a `SpriteBatch.Draw` signature
+  in some environments.
+
 ## Version 1.4.1
 
 * Fix accidental deletion of items when clicking above or below the visible

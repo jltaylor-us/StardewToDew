@@ -46,11 +46,13 @@ namespace ToDew {
 
             private Rectangle upArrowBounds;
             private Rectangle downArrowBounds;
+            private Rectangle insideBorderArea;
             // computes all of the bounds for this object and sub-objects except total Height
             private void ComputeBounds(int positionX, int positionY, int width) {
                 this.bounds.X = positionX;
                 this.bounds.Y = positionY;
                 this.bounds.Width = width;
+                this.insideBorderArea = new Rectangle(positionX + borderWidth * 2, positionY + borderWidth, width - borderWidth * 4, 0);
                 if (IsFirstItem) {
                     upArrowBounds = Rectangle.Empty;
                 } else {
@@ -79,6 +81,7 @@ namespace ToDew {
                 // draw
                 var textSize = spriteBatch.DrawTextBlock(Game1.smallFont, todoItem.Text, new Vector2(this.bounds.X, this.bounds.Y) + new Vector2(leftMarginReserve, topPadding), this.bounds.Width - leftMarginReserve - rightMarginReserve); // text
                 this.bounds.Height = Math.Max(MinMenuItemHeight, topPadding + (int)textSize.Y);
+                this.insideBorderArea.Height = this.bounds.Height - borderWidth * 2;
                 spriteBatch.DrawLine(this.bounds.X, this.bounds.Y, new Vector2(this.bounds.Width, borderWidth), Color.Black); // border
                 if (!IsFirstItem) {
                     bool highlight = upArrowBounds.Contains(mouseX, MouseY);
@@ -124,8 +127,11 @@ namespace ToDew {
                     Game1.playSound("shwip");
                     return;
                 }
-                theList.DeleteItem(todoItem.Id);
-                Game1.playSound("trashcan");
+                if (insideBorderArea.Contains(mouseX, mouseY)) {
+                    theList.DeleteItem(todoItem.Id);
+                    Game1.playSound("trashcan");
+                    return;
+                }
             }
         }
 
@@ -141,6 +147,8 @@ namespace ToDew {
         /// <summary>Force the CurrentScroll to the bottom (MaxScroll) after rendering all items</summary>
         /// Set after adding an item because adding is asynchronous for farmhands.  Cleared on other actions.
         private bool forceScrollToBottom = false;
+        /// <summary>The area where list items are rendered (used to filter mouse clicks)</summary>
+        private Rectangle contentArea = Rectangle.Empty;
 
         public ToDoMenu(ModEntry theMod, ToDoList theList) {
             this.theMod = theMod;
@@ -223,6 +231,7 @@ namespace ToDew {
                 try {
                     // begin draw
                     device.ScissorRectangle = new Rectangle(x + gutter, y + headerHeight, (int)contentWidth, (int)contentHeight - headerHeight);
+                    contentArea = device.ScissorRectangle;
                     contentBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, new RasterizerState { ScissorTestEnable = true });
 
                     //// scroll view
@@ -301,6 +310,7 @@ namespace ToDew {
         /// <param name="playSound">Whether to enable sound.</param>
         public override void receiveLeftClick(int x, int y, bool playSound = true) {
             this.forceScrollToBottom = false;
+            if (!contentArea.Contains(x, y)) return;
             foreach (MenuItem match in this.menuItemList) {
                 if (match.containsPoint(x, y)) {
                     match.receiveClick(x, y, theList);
@@ -315,6 +325,7 @@ namespace ToDew {
         /// <param name="playSound">Whether to enable sound.</param>
         public override void receiveRightClick(int x, int y, bool playSound = true) {
             this.forceScrollToBottom = false;
+            if (!contentArea.Contains(x, y)) return;
             foreach (MenuItem match in this.menuItemList) {
                 if (match.containsPoint(x, y)) {
                     this.Textbox.Text = match.todoItem.Text;

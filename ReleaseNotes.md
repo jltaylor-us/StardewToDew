@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 1.4.1
+
+* Fix accidental deletion of items when clicking above or below the visible
+  scrolling area.
+
 ## Version 1.4.0
 
 * Items can now be reordered.

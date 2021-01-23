@@ -26,13 +26,13 @@ namespace ToDew {
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper) {
+            this.config = helper.ReadConfig<ModConfig>();
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
             helper.Events.Multiplayer.PeerConnected += this.OnPeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
             helper.Events.GameLoop.GameLaunched += onLaunched;
             helper.Events.GameLoop.ReturnedToTitle += this.OnReturnedToTitle;
-            this.config = helper.ReadConfig<ModConfig>();
         }
 
         private void onLaunched(object sender, GameLaunchedEventArgs e) {
@@ -107,11 +107,11 @@ namespace ToDew {
                     Game1.activeClickableMenu = new ToDoMenu(this, this.list);
                 }
                 if (e.Button == this.config.overlay.hotkey) {
-                    if (overlay == null && config.overlay.enabled) {
-                        overlay = new ToDoOverlay(this, list);
-                    } else {
+                    if (overlay != null) {
                         overlay.Dispose();
                         overlay = null;
+                    } else if (config.overlay.enabled) {
+                        overlay = new ToDoOverlay(this, list);
                     }
                 }
             }

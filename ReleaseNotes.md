@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 1.4.3
+
+* Fix a couple of bugs that could result in a System.NullReferenceException
+  in ToDew.ModEntry.OnButtonPressed.
+
 ## Version 1.4.2
 
 * Fix crash with `MissingMethodException` for a `SpriteBatch.Draw` signature

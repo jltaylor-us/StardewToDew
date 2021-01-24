@@ -17,7 +17,10 @@ Follow the usual installation proceedure for SMAPI mods:
 ## How To Use
 
 Bring up the to-do list by pressing the configurable hotkey (default `L`
-for "**l**ist").
+for "**l**ist").  If you have the [Mobile Phone﻿](https://www.nexusmods.com/stardewvalley/mods/6523)
+mod installed then you can also bring up the list with the mobile phone app
+(which does exactly the same thing as the hotkey).
+
 
 Edit your list.  See "List Editing" below for more information on editing.
 

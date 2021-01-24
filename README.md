@@ -10,7 +10,7 @@ if you prefer.
 
 Follow the usual installation proceedure for SMAPI mods:
 1. Install [SMAPI](https://smapi.io)
-2. Download the latest realease of this mod and unzip it into the `Mods` directory
+2. Download the latest release of this mod and unzip it into the `Mods` directory
 3. Run the game using SMAPI
 
 

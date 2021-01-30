@@ -1,6 +1,21 @@
 
 # Release Notes
 
+## Version 1.5.0
+
+* Major new functionality
+  * Mark items done rather than deleting immediately
+  * Per-item configuration
+    * Repeating items
+    * Control visibility based on weather
+    * Control visibility based on day of week
+    * Hide in overlay
+    * Bold text
+    * set as header (can't be marked done)
+
+* Fix overlay not moving down in some areas with a floor level
+
+
 ## Version 1.4.3
 
 * Fix a couple of bugs that could result in a System.NullReferenceException

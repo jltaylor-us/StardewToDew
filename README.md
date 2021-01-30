@@ -43,15 +43,32 @@ Use the scroll gesture on your mouse or trackpad to scroll the list if it
 has more items than fit on one screen.  (Arrows will appear to indicate
 that there are more items.)
 
-Click a list item to remove it from the list.
+Click a list item to mark it done.  Items that have been marked as done
+will not appear in the overlay, and will be removed from the list at
+the end of the day (or reset to not done if they are repeating items).
 
 Use the small up and down arrows to the right of items to reorder them.
+Use the small configure icon to the right of an item to edit its per-item
+properties (see "Item Editing" below).
 
 Right-clicking on an item will copy its text to the textbox (replacing
 whatever is there).  The textbox implementation is from the base game,
 and as far as I can tell you can only add or remove characters from the
 end.  If you see any open-source mods that have more advanced text editing
 capabilities then let me know and I'll take a look to see how they're done.
+
+### Item Editing
+
+The item configuration screen allows you to edit the item text, move the
+item to the top or bottom of the list, delete the item, or set any of several
+properties:
+
+A Header item can help you organize your list by acting as a header or separator
+in the list.  It cannot be marked as "done".
+
+Repeating items have their "done-ness" reset each day.
+
+Item visibility can be set based on the weather or day of the week.
 
 ## Configuration
 

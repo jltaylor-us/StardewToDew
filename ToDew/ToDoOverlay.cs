@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Locations;
 
 namespace ToDew {
     public class OverlayConfig {
@@ -37,6 +38,7 @@ namespace ToDew {
         private readonly Vector2 ListHeaderSize;
         private List<String> lines;
         private List<float> lineHeights;
+        private List<bool> lineBold;
         private Rectangle bounds;
         public ToDoOverlay(ModEntry theMod, ToDoList theList) {
             this.theMod = theMod;
@@ -54,13 +56,23 @@ namespace ToDew {
         private void syncMenuItemList() {
             lines = new List<string>();
             lineHeights = new List<float>();
+            lineBold = new List<bool>();
             if (theList.Items.Count == 0) return;
             float availableWidth = Math.Max(config.maxWidth - marginLeft - marginRight, ListHeaderSize.X);
             float usedWidth = ListHeaderSize.X;
             float topPx = marginTop + ListHeaderSize.Y;
-            for (int i = 0; i < theList.Items.Count && i < config.maxItems; i++) {
+            foreach (var item in theList.Items) {
+                if (item.IsDone || item.HideInOverlay || ! item.IsVisibleToday) continue;
+                if (lines.Count >= config.maxItems) {
+                    lines.Add("…");
+                    float lineHeight = font.MeasureString("…").Y;
+                    lineHeights.Add(lineHeight);
+                    lineBold.Add(false);
+                    topPx += lineHeight;
+                    break;
+                }
                 topPx += lineSpacing;
-                string itemText = theList.Items[i].Text;
+                string itemText = item.IsHeader ? item.Text : ("  " + item.Text);
                 var lineSize = font.MeasureString(itemText);
                 while (lineSize.X > availableWidth) {
                     if (itemText.Length < 2) {
@@ -73,13 +85,8 @@ namespace ToDew {
                 usedWidth = Math.Max(usedWidth, lineSize.X);
                 lines.Add(itemText);
                 lineHeights.Add(lineSize.Y);
+                lineBold.Add(item.IsBold);
                 topPx += lineSize.Y;
-            }
-            if (theList.Items.Count > config.maxItems) {
-                lines.Add("…");
-                float lineHeight = font.MeasureString("…").Y;
-                lineHeights.Add(lineHeight);
-                topPx += lineHeight;
             }
             bounds = new Rectangle(0, 0, (int)(usedWidth + marginLeft + marginRight), (int)topPx + marginBottom);
         }
@@ -98,7 +105,7 @@ namespace ToDew {
             var spriteBatch = e.SpriteBatch;
             float topPx = marginTop;
             Rectangle effectiveBounds = bounds;
-            if (Game1.CurrentMineLevel > 0) {
+            if (Game1.CurrentMineLevel > 0 || Game1.currentLocation is VolcanoDungeon vd && vd.level > 0) {
                 topPx += 80;
                 effectiveBounds.Y += 80;
             }
@@ -108,7 +115,11 @@ namespace ToDew {
             spriteBatch.DrawLine(marginLeft, topPx, new Vector2(ListHeaderSize.X - 3, 1), config.textColor);
             for (int i = 0; i < lines.Count; i++) {
                 topPx += lineSpacing;
-                spriteBatch.DrawString(font, lines[i], new Vector2(marginLeft, topPx), config.textColor);
+                if (lineBold[i]) {
+                    Utility.drawBoldText(spriteBatch, lines[i], font, new Vector2(marginLeft, topPx), config.textColor);
+                } else {
+                    spriteBatch.DrawString(font, lines[i], new Vector2(marginLeft, topPx), config.textColor);
+                }
                 topPx += lineHeights[i];
             }
         }

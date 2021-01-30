@@ -33,6 +33,8 @@ namespace ToDew {
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
             helper.Events.GameLoop.GameLaunched += onLaunched;
             helper.Events.GameLoop.ReturnedToTitle += this.OnReturnedToTitle;
+            helper.Events.GameLoop.Saving += onSaving;
+            helper.Events.GameLoop.DayStarted += onDayStarted;
         }
 
         private void onLaunched(object sender, GameLaunchedEventArgs e) {
@@ -87,6 +89,14 @@ namespace ToDew {
             if (config.overlay.enabled) {
                 overlay = new ToDoOverlay(this, list);
             }
+        }
+
+        private void onDayStarted(object sender, DayStartedEventArgs e) {
+            list?.RefreshVisibility();
+        }
+
+        private void onSaving(object sender, SavingEventArgs e) {
+            list?.PreSaveCleanup();
         }
 
         private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e) {

@@ -19,9 +19,10 @@ namespace ToDew {
         /// </summary>
         private class MenuItem : ClickableComponent {
             const int MinMenuItemHeight = 40;
-            const int rightMarginReserve = 60;
+            const int rightMarginReserve = 90;
             const int borderWidth = 2;
             const int leftMarginReserve = 70;
+            const int iconSpacing = 6;
             const int headerOutdent = 20;
             const int topPadding = 5;
 
@@ -40,8 +41,8 @@ namespace ToDew {
             public bool IsFirstItem { get => myIndex == 0; }
             public bool IsLastItem { get => myIndex == totalItemCount - 1; }
 
-            private static readonly Rectangle smallUpArrowSource = new Rectangle(420, 459, 12, 12);
-            private static readonly Rectangle smallDownArrowSource = new Rectangle(420, 472, 12, 12);
+            // private static readonly Rectangle smallUpArrowSource = new Rectangle(420, 459, 12, 12);
+            // private static readonly Rectangle smallDownArrowSource = new Rectangle(420, 472, 12, 12);
             // private static readonly Rectangle smallConfigButtonRect = new Rectangle(48, 208, 16, 16);
             private static readonly Rectangle configButtonSource = new Rectangle(154, 154, 20, 20);
             private static readonly Rectangle doneButtonSource = new Rectangle(341, 410, 23, 9);
@@ -56,23 +57,37 @@ namespace ToDew {
                 this.bounds.Y = positionY;
                 this.bounds.Width = width;
                 this.insideBorderArea = new Rectangle(positionX + borderWidth * 2, positionY + borderWidth, width - borderWidth * 4, 0);
-                if (IsFirstItem) {
-                    upArrowBounds = Rectangle.Empty;
-                } else {
-                    upArrowBounds = new Rectangle(this.bounds.X + this.bounds.Width - rightMarginReserve + 8, this.bounds.Y + 8, smallUpArrowSource.Width, smallUpArrowSource.Height);
-                }
-                if (IsLastItem) {
-                    downArrowBounds = Rectangle.Empty;
-                } else {
-                    downArrowBounds = new Rectangle(this.bounds.X + this.bounds.Width - rightMarginReserve + 8, this.bounds.Y + 10 + smallUpArrowSource.Height, smallDownArrowSource.Width, smallDownArrowSource.Height);
-                }
+            }
+            private int TopForCenteredVertically(int spriteHeight) {
+                return this.bounds.Y + (this.bounds.Height - spriteHeight) / 2;
             }
             // Computes the remaining bounds that do depend on Height
             private void FinalizeBounds(int height) {
                 this.bounds.Height = height;
                 this.insideBorderArea.Height = this.bounds.Height - borderWidth * 2;
+                int leftPx = this.bounds.X + this.bounds.Width - rightMarginReserve + iconSpacing;
+                if (IsFirstItem) {
+                    upArrowBounds = Rectangle.Empty;
+                } else {
+                    upArrowBounds = new Rectangle(
+                        leftPx,
+                        TopForCenteredVertically(CommonSprites.Icons.UpArrow.Height / 2),
+                        CommonSprites.Icons.UpArrow.Width / 2,
+                        CommonSprites.Icons.UpArrow.Height / 2);
+                }
+                leftPx += CommonSprites.Icons.UpArrow.Width / 2 + iconSpacing;
+                if (IsLastItem) {
+                    downArrowBounds = Rectangle.Empty;
+                } else {
+                    downArrowBounds = new Rectangle(
+                        leftPx,
+                        TopForCenteredVertically(CommonSprites.Icons.DownArrow.Height / 2),
+                        CommonSprites.Icons.DownArrow.Width / 2,
+                        CommonSprites.Icons.DownArrow.Height / 2);
+                }
+                leftPx += CommonSprites.Icons.DownArrow.Width / 2 + iconSpacing;
                 configControlBounds = new Rectangle(
-                    this.bounds.X + this.bounds.Width - rightMarginReserve + smallUpArrowSource.Width + 16,
+                    leftPx,
                     this.bounds.Y + (this.bounds.Height - configButtonSource.Height) / 2,
                     configButtonSource.Width,
                     configButtonSource.Height);
@@ -108,12 +123,12 @@ namespace ToDew {
                 spriteBatch.DrawLine(this.bounds.X, this.bounds.Y, new Vector2(this.bounds.Width, borderWidth), Color.Black); // border
                 if (!IsFirstItem) {
                     bool highlight = upArrowBounds.Contains(mouseX, mouseY);
-                    spriteBatch.DrawSprite(Game1.mouseCursors, smallUpArrowSource, upArrowBounds.X, upArrowBounds.Y, null, highlight ? 1.2f : 1.0f);
+                    spriteBatch.DrawSprite(Game1.mouseCursors, CommonSprites.Icons.UpArrow, upArrowBounds.X, upArrowBounds.Y, null, highlight ? 0.6f : 0.5f);
                     mouseInButton |= highlight;
                 }
                 if (!IsLastItem) {
                     bool highlight = downArrowBounds.Contains(mouseX, mouseY);
-                    spriteBatch.DrawSprite(Game1.mouseCursors, smallDownArrowSource, downArrowBounds.X, downArrowBounds.Y, null, highlight ? 1.2f : 1.0f);
+                    spriteBatch.DrawSprite(Game1.mouseCursors, CommonSprites.Icons.DownArrow, downArrowBounds.X, downArrowBounds.Y, null, highlight ? 0.6f : 0.5f);
                     mouseInButton |= highlight;
                 }
                 if (/* !mouseInButton &&*/ this.containsPoint(mouseX, mouseY)) {

@@ -12,6 +12,8 @@
     * Hide in overlay
     * Bold text
     * set as header (can't be marked done)
+    * move item to top or bottom of list
+
 
 * Fix overlay not moving down in some areas with a floor level
 

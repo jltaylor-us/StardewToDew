@@ -194,14 +194,14 @@ namespace ToDew {
             private static readonly Rectangle okButtonSource = new Rectangle(128, 256, 64, 64);
             private static readonly Rectangle trashSource = new Rectangle(564, 102, 18, 26);
             private static readonly Rectangle trashLidSource = new Rectangle(564, 129, 18, 10);
-            private static readonly ToDoList.DayOfWeek[] daysOfWeek = {
-                ToDoList.DayOfWeek.Sunday,
-                ToDoList.DayOfWeek.Monday,
-                ToDoList.DayOfWeek.Tuesday,
-                ToDoList.DayOfWeek.Wednesday,
-                ToDoList.DayOfWeek.Thurdsay,
-                ToDoList.DayOfWeek.Friday,
-                ToDoList.DayOfWeek.Saturday,
+            private static readonly ToDoList.DayVisibility[] daysOfWeek = {
+                ToDoList.DayVisibility.Sunday,
+                ToDoList.DayVisibility.Monday,
+                ToDoList.DayVisibility.Tuesday,
+                ToDoList.DayVisibility.Wednesday,
+                ToDoList.DayVisibility.Thurdsay,
+                ToDoList.DayVisibility.Friday,
+                ToDoList.DayVisibility.Saturday,
             };
 
             private const int margin = 5;
@@ -387,7 +387,7 @@ namespace ToDew {
                 }
                 for (int day = 0; day < daysOfWeek.Length; day++) {
                     if (daysOfWeekCheckboxes[day].Contains(mouseX, mouseY)) {
-                        theList.SetItemDayOfWeekVisibilityFlag(todoItem, daysOfWeek[day], !todoItem.DayOfWeekVisibility.HasFlag(daysOfWeek[day]));
+                        theList.SetItemDayVisibilityFlag(todoItem, daysOfWeek[day], !todoItem.DayOfWeekVisibility.HasFlag(daysOfWeek[day]));
                         Game1.playSound("drumkit6");
                         return;
                     }

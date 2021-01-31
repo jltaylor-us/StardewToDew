@@ -26,7 +26,7 @@ namespace ToDew {
         };
 
         [Flags]
-        public enum DayOfWeek {
+        public enum DayVisibility {
             None = 0,
             Sunday    = 0b00000001,
             Monday    = 0b00000010,
@@ -35,6 +35,10 @@ namespace ToDew {
             Thurdsay  = 0b00010000,
             Friday    = 0b00100000,
             Saturday  = 0b01000000,
+            Spring    = 0b0001_00000000,
+            Summer    = 0b0010_00000000,
+            Fall      = 0b0100_00000000,
+            Winter    = 0b1000_00000000,
             All = -1
         }
 
@@ -51,7 +55,7 @@ namespace ToDew {
             public bool HideInOverlay { get; set; }
             public WeatherVisiblity FarmWeatherVisiblity { get; set; }
             public WeatherVisiblity IslandWeatherVisiblity { get; set; }
-            public DayOfWeek DayOfWeekVisibility { get; set; }
+            public DayVisibility DayOfWeekVisibility { get; set; }
 
             // transient; reset at beginning of day or when flags change
             public bool IsVisibleToday { get; set; }
@@ -60,19 +64,19 @@ namespace ToDew {
                 // these provide the default values for items read from a serialized form
                 // that doesn't include these properties
                 FarmWeatherVisiblity = WeatherVisiblity.All;
-                DayOfWeekVisibility = DayOfWeek.All;
+                DayOfWeekVisibility = DayVisibility.All;
             }
             public ListItem(long id, string text) {
                 this.Id = id;
                 this.Text = text;
                 // defaults for new items
                 FarmWeatherVisiblity = WeatherVisiblity.All;
-                DayOfWeekVisibility = DayOfWeek.All;
+                DayOfWeekVisibility = DayVisibility.All;
                 IsVisibleToday = true;
             }
 
             internal void RefreshVisibility(bool farmRaining, bool islandRaining) {
-                DayOfWeek dayOfWeek = (DayOfWeek)(1 << (Game1.dayOfMonth % 7));
+                DayVisibility dayOfWeek = (DayVisibility)(1 << (Game1.dayOfMonth % 7));
                 bool dateVisibility = DayOfWeekVisibility.HasFlag(dayOfWeek);
                 bool weatherVisibility = false;
                 weatherVisibility |= FarmWeatherVisiblity.HasFlag(farmRaining ? WeatherVisiblity.Raining : WeatherVisiblity.NotRaining);
@@ -410,7 +414,7 @@ namespace ToDew {
         /// <param name="item">The item to update</param>
         /// <param name="dayOfWeek">The flag to update</param>
         /// <param name="value">whether the flag should be set (true) or cleared (false)</param>
-        public void SetItemDayOfWeekVisibilityFlag(ListItem item, DayOfWeek flag, bool value) {
+        public void SetItemDayVisibilityFlag(ListItem item, DayVisibility flag, bool value) {
             if (Context.IsMainPlayer) {
                 if (value) {
                     item.DayOfWeekVisibility |= flag;
@@ -420,7 +424,7 @@ namespace ToDew {
                 item.RefreshVisibility();
                 Save();
             } else {
-                SendToHost(MessageType.SetDayOfWeekFlag, new Tuple<long, DayOfWeek, bool>(item.Id, flag, value));
+                SendToHost(MessageType.SetDayOfWeekFlag, new Tuple<long, DayVisibility, bool>(item.Id, flag, value));
             }
         }
 
@@ -487,7 +491,8 @@ namespace ToDew {
             public const string SetItemText = "SetItemText";
             public const string SetBoolProperty = "SetBoolProperty";
             public const string SetWeatherFlag = "SetWeatherFlag";
-            public const string SetDayOfWeekFlag = "SetDayOfWeekFlag";
+            public const string SetDayOfWeekFlag = "SetDayOfWeekFlag"; // Deprecated
+            public const string SetDayVisibilityFlag = "SetDayVisibilityFlag";
 
             // messages sent from the host
             public const string ListData = "ListData";
@@ -585,10 +590,11 @@ namespace ToDew {
                             }, t.Item1);
                             break;
                         }
-                    case MessageType.SetDayOfWeekFlag: {
-                            var t = e.ReadAs<Tuple<long, DayOfWeek, bool>>();
-                            CallWithItem("SetDayOfWeekFlag", (li) => {
-                                SetItemDayOfWeekVisibilityFlag(li, t.Item2, t.Item3);
+                    case MessageType.SetDayOfWeekFlag:
+                    case MessageType.SetDayVisibilityFlag: {
+                            var t = e.ReadAs<Tuple<long, DayVisibility, bool>>();
+                            CallWithItem("SetDayVisibilityFlag", (li) => {
+                                SetItemDayVisibilityFlag(li, t.Item2, t.Item3);
                             }, t.Item1);
                             break;
                         }

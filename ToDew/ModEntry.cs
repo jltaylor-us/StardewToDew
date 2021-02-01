@@ -19,8 +19,8 @@ namespace ToDew {
     /// Encapsulates the game lifecycle events and orchestrates the UI (ToDoMenu) data
     /// model (ToDoList) bits.
     public class ModEntry : Mod {
-        private ToDoList list;
-        private ToDoOverlay overlay;
+        private readonly PerScreen<ToDoList> list = new PerScreen<ToDoList>();
+        private readonly PerScreen<ToDoOverlay> overlay = new PerScreen<ToDoOverlay>();
         internal ModConfig config;
 
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
@@ -61,7 +61,7 @@ namespace ToDew {
                 originalTexture.GetData(0, sourceRectangle, data, 0, data.Length);
                 cropTexture.SetData(data);
 
-                phoneApi.AddApp(Helper.ModRegistry.ModID, "To-Dew", () => { Game1.activeClickableMenu = new ToDoMenu(this, this.list); } , cropTexture);
+                phoneApi.AddApp(Helper.ModRegistry.ModID, "To-Dew", () => { Game1.activeClickableMenu = new ToDoMenu(this, this.list.Value); } , cropTexture);
             }
         }
 
@@ -70,7 +70,7 @@ namespace ToDew {
                 Monitor.Log($"Received mod message {e.Type} from {e.FromModID}", LogLevel.Debug);
             }
             if (e.FromModID.Equals(this.ModManifest.UniqueID)) {
-                list?.ReceiveModMessage(e);
+                list.Value?.ReceiveModMessage(e);
             }
         }
 
@@ -85,43 +85,43 @@ namespace ToDew {
                 this.Monitor.Log("OnSaveLoaded", LogLevel.Debug);
                 this.Monitor.Log($"My multiplayer ID: {Game1.player.UniqueMultiplayerID}", LogLevel.Debug);
             }
-            list = new ToDoList(this);
+            list.Value = new ToDoList(this);
             if (config.overlay.enabled) {
-                overlay = new ToDoOverlay(this, list);
+                overlay.Value = new ToDoOverlay(this, list.Value);
             }
         }
 
         private void onDayStarted(object sender, DayStartedEventArgs e) {
-            list?.RefreshVisibility();
+            list.Value?.RefreshVisibility();
         }
 
         private void onSaving(object sender, SavingEventArgs e) {
-            list?.PreSaveCleanup();
+            list.Value?.PreSaveCleanup();
         }
 
         private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e) {
-            list = null;
-            overlay?.Dispose();
-            overlay = null;
+            list.Value = null;
+            overlay.Value?.Dispose();
+            overlay.Value = null;
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
             if (Context.IsWorldReady
                 && Context.IsPlayerFree
-                && list != null
-                && !this.list.IncompatibleMultiplayerHost) {
+                && list.Value != null
+                && !this.list.Value.IncompatibleMultiplayerHost) {
 
                 if (e.Button == this.config.hotkey) {
                     if (Game1.activeClickableMenu != null)
                         Game1.exitActiveMenu();
-                    Game1.activeClickableMenu = new ToDoMenu(this, this.list);
+                    Game1.activeClickableMenu = new ToDoMenu(this, this.list.Value);
                 }
                 if (e.Button == this.config.overlay.hotkey) {
-                    if (overlay != null) {
-                        overlay.Dispose();
-                        overlay = null;
+                    if (overlay.Value != null) {
+                        overlay.Value.Dispose();
+                        overlay.Value = null;
                     } else if (config.overlay.enabled) {
-                        overlay = new ToDoOverlay(this, list);
+                        overlay.Value = new ToDoOverlay(this, list.Value);
                     }
                 }
             }

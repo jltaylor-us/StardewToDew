@@ -8,6 +8,10 @@
 * Make "move item" buttons bigger; move them to be side-by-side
   rather than stacked vertically.
 
+* Attempt to fix some of the split-screen issues (untested).
+  There should no longer be cross-talk between different players'
+  copies of the list.  The overlay toggle should be independent.
+
 ## Version 1.5.0
 
 * Major new functionality

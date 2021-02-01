@@ -68,7 +68,7 @@ in the list.  It cannot be marked as "done".
 
 Repeating items have their "done-ness" reset each day.
 
-Item visibility can be set based on the weather or day of the week.
+Item visibility can be set based on the weather, day of the week, and season.
 
 ## Configuration
 

@@ -1,6 +1,13 @@
 
 # Release Notes
 
+## Version 1.6.0
+
+* Add configuration of item visibility based on season.
+
+* Make "move item" buttons bigger; move them to be side-by-side
+  rather than stacked vertically.
+
 ## Version 1.5.0
 
 * Major new functionality

@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.6.1
+
+* Suppress overlay during in-game screenshots
+
 ## Version 1.6.0
 
 * Add configuration of item visibility based on season.

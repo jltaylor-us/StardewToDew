@@ -1,5 +1,6 @@
 ﻿// Copyright 2020 Jamie Taylor
 using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -11,6 +12,7 @@ namespace ToDew {
     /// <summary>The configuration data model.</summary>
     public class ModConfig {
         public SButton hotkey = SButton.L;
+        public KeybindList hotkeyList = new KeybindList();
         public SButton secondaryCloseButton = SButton.ControllerBack;
         public bool debug = false;
         public OverlayConfig overlay = new OverlayConfig();
@@ -27,7 +29,7 @@ namespace ToDew {
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper) {
             this.config = helper.ReadConfig<ModConfig>();
-            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            helper.Events.Input.ButtonsChanged += this.OnButtonsChanged;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
             helper.Events.Multiplayer.PeerConnected += this.OnPeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
@@ -105,18 +107,18 @@ namespace ToDew {
             overlay.Value = null;
         }
 
-        private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
+        private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e) {
             if (Context.IsWorldReady
                 && Context.IsPlayerFree
                 && list.Value != null
                 && !this.list.Value.IncompatibleMultiplayerHost) {
 
-                if (e.Button == this.config.hotkey) {
+                if (e.Pressed.Contains(this.config.hotkey) || this.config.hotkeyList.JustPressed()) {
                     if (Game1.activeClickableMenu != null)
                         Game1.exitActiveMenu();
                     Game1.activeClickableMenu = new ToDoMenu(this, this.list.Value);
                 }
-                if (e.Button == this.config.overlay.hotkey) {
+                if (e.Pressed.Contains(this.config.overlay.hotkey) || this.config.overlay.hotkeyList.JustPressed()) {
                     if (overlay.Value != null) {
                         overlay.Value.Dispose();
                         overlay.Value = null;

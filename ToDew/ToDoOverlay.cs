@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Locations;
 
@@ -12,6 +13,8 @@ namespace ToDew {
     public class OverlayConfig {
         public bool enabled = true;
         public SButton hotkey = SButton.None;
+        public KeybindList hotkeyList = new KeybindList();
+        public bool hideAtFestivals = false;
         public int maxWidth = 600;
         public int maxItems = 10;
         public Color backgroundColor = Color.Black * 0.2f;
@@ -20,6 +23,7 @@ namespace ToDew {
             api.RegisterLabel(modManifest, "Overlay", "Configure the always-on overlay showing the list");
             api.RegisterSimpleOption(modManifest, "Enabled", "Is the overlay enabled?", () => getThis().enabled, (bool val) => getThis().enabled = val);
             api.RegisterSimpleOption(modManifest, "Hotkey", "Hotkey to show or hide", () => getThis().hotkey, (SButton val) => getThis().hotkey = val);
+            api.RegisterSimpleOption(modManifest, "Hide at festivals", "Hide the overlay during festivals?", () => getThis().hideAtFestivals, (bool val) => getThis().hideAtFestivals = val);
             api.RegisterSimpleOption(modManifest, "Max Width", "Maximum width of the overlay in pixels", () => getThis().maxWidth, (int val) => getThis().maxWidth = val);
             api.RegisterSimpleOption(modManifest, "Max Items", "Maximum number of items to show in the overlay", () => getThis().maxItems, (int val) => getThis().maxItems = val);
         }
@@ -103,6 +107,7 @@ namespace ToDew {
             if (lines.Count == 0) return;
             if (!config.enabled) return; // shouldn't get this far, but why not check anyway
             if (Game1.game1.takingMapScreenshot) return;
+            if (config.hideAtFestivals && Game1.isFestival()) return;
             var spriteBatch = e.SpriteBatch;
             float topPx = marginTop;
             Rectangle effectiveBounds = bounds;

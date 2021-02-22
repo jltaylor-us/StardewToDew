@@ -79,12 +79,16 @@ whether it is enabled at all).
 
 If [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 is installed then there will be an entry for To-Dew in the in-game config
-menu.
+menu.  A few configuration options are only available in `config.json` because
+there is no editor for values of that type in Generic Mod Config Menu.  For
+example, there are configuration options to allow multi-key bindings
+(introduced in SMAPI 3.9) for the hotkey and overlay hotkey, but these are
+not available in the in-game config menu.
 
 
 ## Compatibility
 
-Works with Stardew Valley 1.5 / SMAPI 3.8, single and multiplayer (but see
+Works with Stardew Valley 1.5 / SMAPI 3.9, single and multiplayer (but see
 further notes on Multiplayer below).  No known incompatibilities with
 other mods.
 

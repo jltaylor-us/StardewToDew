@@ -39,6 +39,10 @@ namespace ToDew {
             Summer    = 0b0010_00000000,
             Fall      = 0b0100_00000000,
             Winter    = 0b1000_00000000,
+            Week1     = 0b0001_0000_00000000,
+            Week2     = 0b0010_0000_00000000,
+            Week3     = 0b0100_0000_00000000,
+            Week4     = 0b1000_0000_00000000,
             All = -1
         }
 
@@ -78,7 +82,8 @@ namespace ToDew {
             internal void RefreshVisibility(bool farmRaining, bool islandRaining) {
                 DayVisibility dayOfWeek = (DayVisibility)(1 << (Game1.dayOfMonth % 7));
                 DayVisibility season = (DayVisibility)((int)DayVisibility.Spring << Utility.getSeasonNumber(Game1.currentSeason));
-                bool dateVisibility = DayOfWeekVisibility.HasFlag(dayOfWeek | season);
+                DayVisibility week = (DayVisibility)((int)DayVisibility.Week1 << (Game1.dayOfMonth % 7));
+                bool dateVisibility = DayOfWeekVisibility.HasFlag(dayOfWeek | week | season);
                 bool weatherVisibility = false;
                 weatherVisibility |= FarmWeatherVisiblity.HasFlag(farmRaining ? WeatherVisiblity.Raining : WeatherVisiblity.NotRaining);
                 weatherVisibility |= IslandWeatherVisiblity.HasFlag(islandRaining ? WeatherVisiblity.Raining : WeatherVisiblity.NotRaining);

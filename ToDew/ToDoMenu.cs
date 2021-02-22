@@ -209,6 +209,12 @@ namespace ToDew {
                 ToDoList.DayVisibility.Fall,
                 ToDoList.DayVisibility.Winter,
             };
+            private static readonly ToDoList.DayVisibility[] weeks = {
+                ToDoList.DayVisibility.Week1,
+                ToDoList.DayVisibility.Week2,
+                ToDoList.DayVisibility.Week3,
+                ToDoList.DayVisibility.Week4,
+            };
 
 
             private const int margin = 5;
@@ -228,6 +234,7 @@ namespace ToDew {
             private Rectangle islandNotRainingCheckbox = Rectangle.Empty;
             private Rectangle[] daysOfWeekCheckboxes = new Rectangle[daysOfWeek.Length];
             private Rectangle[] seasonsCheckboxes = new Rectangle[seasons.Length];
+            private Rectangle[] weeksCheckboxes = new Rectangle[weeks.Length];
 
             private const int trashScale = 3;
             private const int checkboxScale = 3;
@@ -281,6 +288,14 @@ namespace ToDew {
                     rightColTopPx += daysOfWeekCheckboxes[day].Height + margin;
                 }
 
+                int numWidth = (int)Game1.smallFont.MeasureString("4").X;
+                int weekLeftPx = daysOfWeekCheckboxes[3].Right + margin + (int)Game1.smallFont.MeasureString(daysOfWeek[3].ToString()).X;
+                int weekTopPx = daysOfWeekCheckboxes[1].Top;
+                for (int week = 0; week < weeks.Length; week++) {
+                    weeksCheckboxes[week] = MakeCheckboxRect(weekLeftPx, weekTopPx);
+                    weekLeftPx += weeksCheckboxes[week].Width + margin + numWidth + numWidth;
+                }
+
                 topPx = Math.Max(topPx, rightColTopPx);
                 leftPx += (int)Game1.smallFont.MeasureString("Show only in: ").X;
                 int spaceWidth = (int)Game1.smallFont.MeasureString(" ").X;
@@ -324,6 +339,11 @@ namespace ToDew {
                 spriteBatch.DrawString(Game1.smallFont, "Show Only on These Days:", new Vector2(daysOfWeekCheckboxes[0].X, bounds.Y + margin * 2), Color.Black);
                 for (int day = 0; day < daysOfWeek.Length; day++) {
                     DrawCheckbox(spriteBatch, daysOfWeekCheckboxes[day], todoItem.DayOfWeekVisibility.HasFlag(daysOfWeek[day]), daysOfWeek[day].ToString());
+                }
+                // weeks
+                spriteBatch.DrawString(Game1.smallFont, "Week:", new Vector2(weeksCheckboxes[0].X, daysOfWeekCheckboxes[0].Top), Color.Black);
+                for (int week = 0; week < weeks.Length; week++) {
+                    DrawCheckbox(spriteBatch, weeksCheckboxes[week], todoItem.DayOfWeekVisibility.HasFlag(weeks[week]), Convert.ToString(week + 1));
                 }
                 // seasons
                 spriteBatch.DrawString(Game1.smallFont, "Show only in: ", new Vector2(bounds.X + margin + leftPadding, seasonsCheckboxes[0].Y), Color.Black);
@@ -417,6 +437,13 @@ namespace ToDew {
                 for (int season = 0; season < seasons.Length; season++) {
                     if (seasonsCheckboxes[season].Contains(mouseX, mouseY)) {
                         theList.SetItemDayVisibilityFlag(todoItem, seasons[season], !todoItem.DayOfWeekVisibility.HasFlag(seasons[season]));
+                        Game1.playSound("drumkit6");
+                        return;
+                    }
+                }
+                for (int week = 0; week < weeks.Length; week++) {
+                    if (weeksCheckboxes[week].Contains(mouseX, mouseY)) {
+                        theList.SetItemDayVisibilityFlag(todoItem, weeks[week], !todoItem.DayOfWeekVisibility.HasFlag(weeks[week]));
                         Game1.playSound("drumkit6");
                         return;
                     }

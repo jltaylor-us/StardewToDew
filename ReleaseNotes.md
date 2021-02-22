@@ -1,6 +1,20 @@
 
 # Release Notes
 
+## Version 1.7.0
+
+* Add `hotkeyList` and `overlay.hotkeyList` config options.  These do
+  the same thing as `hotkey` and `overlay.hotkey`, but support the
+  multi-key bindings added in SMAPI 3.9.  Increase required SMAPI
+  version to 3.9.  I did not just update the existing config options
+  because I think it would be rude to overwrite a multi-key binding
+  when edited in the Generic Mod Config Menu (which doesn't support
+  multi-key bindings).
+
+* Add configuration of item visibility based on week.
+
+* Add configuration option to hide the overlay while at festivals.
+
 ## Version 1.6.1
 
 * Suppress overlay during in-game screenshots

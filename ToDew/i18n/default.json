@@ -50,7 +50,7 @@
     "menu.edit.not-raining-on-island": "Not Raining on Island",
     "menu.edit.only-days": "Show Only on These Days:",
     "menu.edit.week": "Week:",
-    "menu.edit.only-season": "Show only in:", // keep the trailing space!
+    "menu.edit.only-season": "Show only in:",
 
     // full day names (since the game only has translations for the short names)
     "sunday": "Sunday",

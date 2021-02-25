@@ -20,19 +20,19 @@ namespace ToDew {
         public Color backgroundColor = Color.Black * 0.2f;
         public Color textColor = Color.White * 0.8f;
         public static void RegisterConfigMenuOptions(Func<OverlayConfig> getThis, GenericModConfigMenuAPI api, IManifest modManifest) {
-            api.RegisterLabel(modManifest, "Overlay", "Configure the always-on overlay showing the list");
-            api.RegisterSimpleOption(modManifest, "Enabled", "Is the overlay enabled?", () => getThis().enabled, (bool val) => getThis().enabled = val);
-            api.RegisterSimpleOption(modManifest, "Hotkey", "Hotkey to show or hide", () => getThis().hotkey, (SButton val) => getThis().hotkey = val);
-            api.RegisterSimpleOption(modManifest, "Hide at festivals", "Hide the overlay during festivals?", () => getThis().hideAtFestivals, (bool val) => getThis().hideAtFestivals = val);
-            api.RegisterSimpleOption(modManifest, "Max Width", "Maximum width of the overlay in pixels", () => getThis().maxWidth, (int val) => getThis().maxWidth = val);
-            api.RegisterSimpleOption(modManifest, "Max Items", "Maximum number of items to show in the overlay", () => getThis().maxItems, (int val) => getThis().maxItems = val);
+            api.RegisterLabel(modManifest, I18n.Config_Overlay(), I18n.Config_Overlay_Desc());
+            api.RegisterSimpleOption(modManifest, I18n.Config_Overlay_Enabled(), I18n.Config_Overlay_Enabled_Desc(), () => getThis().enabled, (bool val) => getThis().enabled = val);
+            api.RegisterSimpleOption(modManifest, I18n.Config_Overlay_Hotkey(), I18n.Config_Overlay_Hotkey_Desc(), () => getThis().hotkey, (SButton val) => getThis().hotkey = val);
+            api.RegisterSimpleOption(modManifest, I18n.Config_Overlay_HideAtFestivals(), I18n.Config_Overlay_HideAtFestivals_Desc(), () => getThis().hideAtFestivals, (bool val) => getThis().hideAtFestivals = val);
+            api.RegisterSimpleOption(modManifest, I18n.Config_Overlay_MaxWidth(), I18n.Config_Overlay_MaxWidth_Desc(), () => getThis().maxWidth, (int val) => getThis().maxWidth = val);
+            api.RegisterSimpleOption(modManifest, I18n.Config_Overlay_MaxItems(), I18n.Config_Overlay_MaxItems_Desc(), () => getThis().maxItems, (int val) => getThis().maxItems = val);
         }
     }
     public class ToDoOverlay : IDisposable {
         private readonly ModEntry theMod;
         private readonly ToDoList theList;
         private readonly OverlayConfig config;
-        private const string ListHeader = "To-Dew List";
+        private string ListHeader = I18n.Overlay_Header();
         private const int marginTop = 5;
         private const int marginLeft = 5;
         private const int marginRight = 5;

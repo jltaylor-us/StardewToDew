@@ -28,6 +28,7 @@ namespace ToDew {
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper) {
+            I18n.Init(helper.Translation);
             this.config = helper.ReadConfig<ModConfig>();
             helper.Events.Input.ButtonsChanged += this.OnButtonsChanged;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
@@ -44,9 +45,9 @@ namespace ToDew {
             var api = Helper.ModRegistry.GetApi<GenericModConfigMenuAPI>("spacechase0.GenericModConfigMenu");
             if (api != null) {
                 api.RegisterModConfig(ModManifest, () => config = new ModConfig(), () => Helper.WriteConfig(config));
-                api.RegisterSimpleOption(ModManifest, "Hotkey", "The key to bring up the to-do list", () => config.hotkey, (SButton val) => config.hotkey = val);
-                api.RegisterSimpleOption(ModManifest, "Secondary Close Button", "An alternate key (besides ESC) to close the to-do list", () => config.secondaryCloseButton, (SButton val) => config.secondaryCloseButton = val);
-                api.RegisterSimpleOption(ModManifest, "Debug", "Enable debugging output in the log", () => config.debug, (bool val) => config.debug = val);
+                api.RegisterSimpleOption(ModManifest, I18n.Config_Hotkey(), I18n.Config_Hotkey_Desc(), () => config.hotkey, (SButton val) => config.hotkey = val);
+                api.RegisterSimpleOption(ModManifest, I18n.Config_SecondaryCloseButton(), I18n.Config_SecondaryCloseButton_Desc(), () => config.secondaryCloseButton, (SButton val) => config.secondaryCloseButton = val);
+                api.RegisterSimpleOption(ModManifest, I18n.Config_Debug(), I18n.Config_Debug_Desc(), () => config.debug, (bool val) => config.debug = val);
                 OverlayConfig.RegisterConfigMenuOptions(() => config.overlay, api, ModManifest);
             }
 

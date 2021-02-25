@@ -235,6 +235,16 @@ namespace ToDew {
             private Rectangle[] daysOfWeekCheckboxes = new Rectangle[daysOfWeek.Length];
             private Rectangle[] seasonsCheckboxes = new Rectangle[seasons.Length];
             private Rectangle[] weeksCheckboxes = new Rectangle[weeks.Length];
+            private string[] dayOfWeekNames = {
+                I18n.Sunday(),
+                I18n.Monday(),
+                I18n.Tuesday(),
+                I18n.Wednesday(),
+                I18n.Thursday(),
+                I18n.Friday(),
+                I18n.Saturday(),
+                I18n.Sunday()
+            };
 
             private const int trashScale = 3;
             private const int checkboxScale = 3;
@@ -283,13 +293,15 @@ namespace ToDew {
                 int rightColTopPx = bounds.Y + margin + lineHeight;
                 int rightColLeftPx = bounds.X + 375;
 
+                int widestDay = 0;
                 for (int day = 0; day < daysOfWeek.Length; day++) {
                     daysOfWeekCheckboxes[day] = MakeCheckboxRect(rightColLeftPx, rightColTopPx);
                     rightColTopPx += daysOfWeekCheckboxes[day].Height + margin;
+                    widestDay = Math.Max(widestDay, (int)Game1.smallFont.MeasureString(dayOfWeekNames[day]).X);
                 }
 
                 int numWidth = (int)Game1.smallFont.MeasureString("4").X;
-                int weekLeftPx = daysOfWeekCheckboxes[3].Right + margin + (int)Game1.smallFont.MeasureString(daysOfWeek[3].ToString()).X;
+                int weekLeftPx = daysOfWeekCheckboxes[3].Right + margin + widestDay;
                 int weekTopPx = daysOfWeekCheckboxes[1].Top;
                 for (int week = 0; week < weeks.Length; week++) {
                     weeksCheckboxes[week] = MakeCheckboxRect(weekLeftPx, weekTopPx);
@@ -297,11 +309,11 @@ namespace ToDew {
                 }
 
                 topPx = Math.Max(topPx, rightColTopPx);
-                leftPx += (int)Game1.smallFont.MeasureString("Show only in: ").X;
+                leftPx += (int)Game1.smallFont.MeasureString(I18n.Menu_Edit_OnlySeason()).X;
                 int spaceWidth = (int)Game1.smallFont.MeasureString(" ").X;
                 for (int season = 0; season < seasons.Length; season++) {
                     seasonsCheckboxes[season] = MakeCheckboxRect(leftPx, topPx);
-                    leftPx += seasonsCheckboxes[season].Width + margin + (int)Game1.smallFont.MeasureString(seasons[season].ToString()).X + spaceWidth;
+                    leftPx += seasonsCheckboxes[season].Width + margin + (int)Game1.smallFont.MeasureString(Utility.getSeasonNameFromNumber(season)).X + spaceWidth;
                 }
                 topPx += seasonsCheckboxes[0].Height;
 
@@ -320,35 +332,35 @@ namespace ToDew {
                 int topPx = bounds.Y + margin;
 
                 // checkboxes
-                DrawCheckbox(spriteBatch, headerCheckbox, todoItem.IsHeader, "Header");
-                DrawCheckbox(spriteBatch, boldCheckbox, todoItem.IsBold, "Bold");
-                DrawCheckbox(spriteBatch, repeatingCheckbox, todoItem.IsRepeating, "Repeating");
-                DrawCheckbox(spriteBatch, hideInOverlayCheckbox, todoItem.HideInOverlay, "Hide in Overlay");
+                DrawCheckbox(spriteBatch, headerCheckbox, todoItem.IsHeader, I18n.Menu_Edit_Header());
+                DrawCheckbox(spriteBatch, boldCheckbox, todoItem.IsBold, I18n.Menu_Edit_Bold());
+                DrawCheckbox(spriteBatch, repeatingCheckbox, todoItem.IsRepeating, I18n.Menu_Edit_Repeating());
+                DrawCheckbox(spriteBatch, hideInOverlayCheckbox, todoItem.HideInOverlay, I18n.Menu_Edit_HideInOverlay());
 
                 // weather
-                spriteBatch.DrawString(Game1.smallFont, "Show Item When:", new Vector2(hideInOverlayCheckbox.X, hideInOverlayCheckbox.Bottom + margin * 2), Color.Black);
-                DrawCheckbox(spriteBatch, rainingCheckbox, todoItem.FarmWeatherVisiblity.HasFlag(ToDoList.WeatherVisiblity.Raining), "Raining on Farm");
-                DrawCheckbox(spriteBatch, notRainingCheckbox, todoItem.FarmWeatherVisiblity.HasFlag(ToDoList.WeatherVisiblity.NotRaining), "Not Raining on Farm");
+                spriteBatch.DrawString(Game1.smallFont, I18n.Menu_Edit_ShowWhen(), new Vector2(hideInOverlayCheckbox.X, hideInOverlayCheckbox.Bottom + margin * 2), Color.Black);
+                DrawCheckbox(spriteBatch, rainingCheckbox, todoItem.FarmWeatherVisiblity.HasFlag(ToDoList.WeatherVisiblity.Raining), I18n.Menu_Edit_RainingOnFarm());
+                DrawCheckbox(spriteBatch, notRainingCheckbox, todoItem.FarmWeatherVisiblity.HasFlag(ToDoList.WeatherVisiblity.NotRaining), I18n.Menu_Edit_NotRainingOnFarm());
                 if (Game1.player.hasOrWillReceiveMail("Visited_Island")) {
                     //spriteBatch.DrawString(Game1.smallFont, "Island Weather", new Vector2(notRainingCheckbox.X, notRainingCheckbox.Bottom + margin * 2), Color.Black);
-                    DrawCheckbox(spriteBatch, islandRainingCheckbox, todoItem.IslandWeatherVisiblity.HasFlag(ToDoList.WeatherVisiblity.Raining), "Raining on Island");
-                    DrawCheckbox(spriteBatch, islandNotRainingCheckbox, todoItem.IslandWeatherVisiblity.HasFlag(ToDoList.WeatherVisiblity.NotRaining), "Not Raining on Island");
+                    DrawCheckbox(spriteBatch, islandRainingCheckbox, todoItem.IslandWeatherVisiblity.HasFlag(ToDoList.WeatherVisiblity.Raining), I18n.Menu_Edit_RainingOnIsland());
+                    DrawCheckbox(spriteBatch, islandNotRainingCheckbox, todoItem.IslandWeatherVisiblity.HasFlag(ToDoList.WeatherVisiblity.NotRaining), I18n.Menu_Edit_NotRainingOnIsland());
                 }
 
                 // days of week
-                spriteBatch.DrawString(Game1.smallFont, "Show Only on These Days:", new Vector2(daysOfWeekCheckboxes[0].X, bounds.Y + margin * 2), Color.Black);
+                spriteBatch.DrawString(Game1.smallFont, I18n.Menu_Edit_OnlyDays(), new Vector2(daysOfWeekCheckboxes[0].X, bounds.Y + margin * 2), Color.Black);
                 for (int day = 0; day < daysOfWeek.Length; day++) {
-                    DrawCheckbox(spriteBatch, daysOfWeekCheckboxes[day], todoItem.DayOfWeekVisibility.HasFlag(daysOfWeek[day]), daysOfWeek[day].ToString());
+                    DrawCheckbox(spriteBatch, daysOfWeekCheckboxes[day], todoItem.DayOfWeekVisibility.HasFlag(daysOfWeek[day]), dayOfWeekNames[day]);
                 }
                 // weeks
-                spriteBatch.DrawString(Game1.smallFont, "Week:", new Vector2(weeksCheckboxes[0].X, daysOfWeekCheckboxes[0].Top), Color.Black);
+                spriteBatch.DrawString(Game1.smallFont, I18n.Menu_Edit_Week(), new Vector2(weeksCheckboxes[0].X, daysOfWeekCheckboxes[0].Top), Color.Black);
                 for (int week = 0; week < weeks.Length; week++) {
                     DrawCheckbox(spriteBatch, weeksCheckboxes[week], todoItem.DayOfWeekVisibility.HasFlag(weeks[week]), Convert.ToString(week + 1));
                 }
                 // seasons
-                spriteBatch.DrawString(Game1.smallFont, "Show only in: ", new Vector2(bounds.X + margin + leftPadding, seasonsCheckboxes[0].Y), Color.Black);
+                spriteBatch.DrawString(Game1.smallFont, I18n.Menu_Edit_OnlySeason(), new Vector2(bounds.X + margin + leftPadding, seasonsCheckboxes[0].Y), Color.Black);
                 for (int season = 0; season < seasons.Length; season++ ) {
-                    DrawCheckbox(spriteBatch, seasonsCheckboxes[season], todoItem.DayOfWeekVisibility.HasFlag(seasons[season]), seasons[season].ToString());
+                    DrawCheckbox(spriteBatch, seasonsCheckboxes[season], todoItem.DayOfWeekVisibility.HasFlag(seasons[season]), Utility.getSeasonNameFromNumber(season));
                 }
 
 
@@ -500,7 +512,7 @@ namespace ToDew {
 
             // create the text box
             this.Textbox = new TextBox(Sprites.Textbox.Sheet, null, Game1.smallFont, Color.Black);
-            this.Textbox.TitleText = "Add to-do item";
+            this.Textbox.TitleText = I18n.Menu_Textbox_Title();
             this.Textbox.Selected = true;
 
             // initialize the list UI and callback
@@ -525,7 +537,7 @@ namespace ToDew {
                     return;
                 }
             }
-            theMod.Monitor.Log($"Item {currentItemEditor.todoItem.Id} was deleted by another player", LogLevel.Info);
+            theMod.Monitor.Log(I18n.Message_CurrentItemDeleted(itemId: currentItemEditor.todoItem.Id), LogLevel.Info);
             currentItemEditor = null;
             Textbox.Text = "";
         }
@@ -556,11 +568,11 @@ namespace ToDew {
                     Sprites.Letter.Sprite, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
 
                 if (currentItemEditor == null) {
-                    Vector2 titleSize = backgroundBatch.DrawTextBlock(font, "To-Dew List", new Vector2(x + leftOffset, y + topOffset), bodyWidth, bold: true);
-                    Vector2 farmNameSize = backgroundBatch.DrawTextBlock(font, "for " + Game1.player.farmName + " Farm", new Vector2(x + leftOffset + titleSize.X + spaceWidth, y + topOffset), bodyWidth);
+                    Vector2 titleSize = backgroundBatch.DrawTextBlock(font, I18n.Menu_List_TitleBoldPart(), new Vector2(x + leftOffset, y + topOffset), bodyWidth, bold: true);
+                    Vector2 farmNameSize = backgroundBatch.DrawTextBlock(font, I18n.Menu_List_TitleRest(farmName: Game1.player.farmName), new Vector2(x + leftOffset + titleSize.X + spaceWidth, y + topOffset), bodyWidth);
                     topOffset += Math.Max(titleSize.Y, farmNameSize.Y);
                 } else {
-                    Vector2 titleSize = backgroundBatch.DrawTextBlock(font, "Editing item", new Vector2(x + leftOffset, y + topOffset), bodyWidth, bold: true);
+                    Vector2 titleSize = backgroundBatch.DrawTextBlock(font, I18n.Menu_Edit_Title(), new Vector2(x + leftOffset, y + topOffset), bodyWidth, bold: true);
                     topOffset += titleSize.Y;
                 }
 

@@ -152,9 +152,9 @@ namespace ToDew {
                 this.theList = theMod.Helper.Data.ReadSaveData<ListData>(SaveKey) ?? new ListData();
                 if (!theList.DataFormatVersion.Equals(CurrentDataFormatVersion)) {
                     if (theList.DataFormatVersion.IsNewerThan(CurrentDataFormatVersion)) {
-                        theMod.Monitor.Log($"List information in this save is in a newer format version ({theList.DataFormatVersion}) than this version of {theMod.ModManifest.Name} uses ({CurrentDataFormatVersion}).  The next save will use this older version, which will result in losing any attributes added in the newer version.", LogLevel.Warn);
+                        theMod.Monitor.Log(I18n.Message_SaveVersionNewer(saveFormatVersion: theList.DataFormatVersion, modName: theMod.ModManifest.Name, modFormatVersion: CurrentDataFormatVersion), LogLevel.Warn);
                     } else {
-                        theMod.Monitor.Log($"Read list information in format version {theList.DataFormatVersion}.  It will be updated to the current format version ({CurrentDataFormatVersion}) on next save.", LogLevel.Info);
+                        theMod.Monitor.Log(I18n.Message_SaveVersionOlder(saveFormatVersion: theList.DataFormatVersion, modFormatVersion: CurrentDataFormatVersion), LogLevel.Info);
                     }
                     theList.DataFormatVersion = CurrentDataFormatVersion;
                 }
@@ -165,10 +165,10 @@ namespace ToDew {
                 var hostMod = host.GetMod(theMod.ModManifest.UniqueID);
                 if (hostMod == null) {
                     _incompatibleMultiplayerHost = true;
-                    theMod.Monitor.Log($"Host does not have {theMod.ModManifest.Name} installed; list disabled.", LogLevel.Warn);
+                    theMod.Monitor.Log(I18n.Message_HostNoMod(modName: theMod.ModManifest.Name), LogLevel.Warn);
                 } else {
                     if (!hostMod.Version.Equals(theMod.ModManifest.Version)) {
-                        theMod.Monitor.Log($"Host has version {hostMod.Version} of {theMod.ModManifest.Name} installed, but you have version {theMod.ModManifest.Version}.  Attempting to proceed anyway.",
+                        theMod.Monitor.Log(I18n.Message_HostDifferentModVersion(hostVersion: hostMod.Version, modName: theMod.ModManifest.Name, myVersion: theMod.ModManifest.Version),
                             hostMod.Version.MajorVersion == theMod.ModManifest.Version.MajorVersion ? LogLevel.Info : LogLevel.Warn);
                     }
                     SendToHost(MessageType.RequestList, Game1.player.UniqueMultiplayerID);
@@ -605,7 +605,7 @@ namespace ToDew {
                             break;
                         }
                     default:
-                        theMod.Monitor.Log($"Ignoring unexpected message type {e.Type} from player {e.FromPlayerID} ({Game1.getFarmer(e.FromPlayerID)?.Name})",
+                        theMod.Monitor.Log(I18n.Message_IgnoringUnexpectedMessageType(messageType: e.Type, fromId: e.FromPlayerID, fromName: Game1.getFarmer(e.FromPlayerID)?.Name),
                             LogLevel.Warn);
                         break;
                 }
@@ -616,18 +616,18 @@ namespace ToDew {
                         if (newList.DataFormatVersion.IsNewerThan(theList.DataFormatVersion)) {
                             if (newList.DataFormatVersion.MajorVersion != theList.DataFormatVersion.MajorVersion) {
                                 _incompatibleMultiplayerHost = true;
-                                theMod.Monitor.Log($"Host is using a newer data format version ({newList.DataFormatVersion}) ({theList.DataFormatVersion}) than this version of {theMod.ModManifest.Name} uses ({CurrentDataFormatVersion}).  Since it has a different major version number, we're not going to try to handle it.", LogLevel.Warn);
+                                theMod.Monitor.Log(I18n.Message_HostNewerDataFormatMajor(hostVersion: newList.DataFormatVersion, modName: theMod.ModManifest.Name, myVersion: CurrentDataFormatVersion), LogLevel.Warn);
                             } else {
-                                theMod.Monitor.Log($"Host is using a newer data format version ({newList.DataFormatVersion}) ({theList.DataFormatVersion}) than this version of {theMod.ModManifest.Name} uses ({CurrentDataFormatVersion}), but we'll do our best to deal with it.", LogLevel.Warn);
+                                theMod.Monitor.Log(I18n.Message_HostNewerDataFormatMinor(hostVersion: newList.DataFormatVersion, modName: theMod.ModManifest.Name, myVersion: CurrentDataFormatVersion), LogLevel.Warn);
                             }
                         } else {
-                            theMod.Monitor.Log($"Host is using data format version {newList.DataFormatVersion}, which is older than the current format version ({CurrentDataFormatVersion}).  Some features may be unavailable.", LogLevel.Info);
+                            theMod.Monitor.Log(I18n.Message_HostOlderDataFormat(hostVersion: newList.DataFormatVersion, myVersion: CurrentDataFormatVersion), LogLevel.Info);
                         }
                     }
                     theList = newList;
                     this.OnChanged?.Invoke(this, this.Items);
                 } else {
-                    theMod.Monitor.Log($"Ignoring unexpected message type {e.Type} from player {e.FromPlayerID} ({Game1.getFarmer(e.FromPlayerID)?.Name})",
+                    theMod.Monitor.Log(I18n.Message_IgnoringUnexpectedMessageType(messageType: e.Type, fromId: e.FromPlayerID, fromName: Game1.getFarmer(e.FromPlayerID)?.Name),
                         LogLevel.Warn);
                 }
             }

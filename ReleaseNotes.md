@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 1.8.0
+
+* Now includes translations for several languages.  The translations
+  are all via Google Translate, so they're probably not very good.
+
 ## Version 1.7.0
 
 * Add `hotkeyList` and `overlay.hotkeyList` config options.  These do

@@ -96,6 +96,8 @@ I have no idea what things do or do not work with split-screen.  As
 far as I can tell you have to have controllers to even start split-screen,
 and I don't.
 
+Translations are included for several languages, but the translations are
+all via Google Translate, so they are probably not very good.
 
 ## Multiplayer Support
 

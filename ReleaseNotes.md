@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.8.1
+
+* Updates to Russian translation from nexusmods user Newrotd
+
 ## Version 1.8.0
 
 * Now includes translations for several languages.  The translations

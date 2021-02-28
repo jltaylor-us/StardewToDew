@@ -97,7 +97,8 @@ far as I can tell you have to have controllers to even start split-screen,
 and I don't.
 
 Translations are included for several languages, but the translations are
-all via Google Translate, so they are probably not very good.
+all via Google Translate, so they are probably not very good.  (Thanks to
+nexusmods user Newrotd for updates to the Russian translation.)
 
 ## Multiplayer Support
 

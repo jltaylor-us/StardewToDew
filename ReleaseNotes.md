@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.8.2
+
+* Hide the overlay during events
+
 ## Version 1.8.1
 
 * Updates to Russian translation from nexusmods user Newrotd

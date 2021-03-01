@@ -107,6 +107,7 @@ namespace ToDew {
             if (lines.Count == 0) return;
             if (!config.enabled) return; // shouldn't get this far, but why not check anyway
             if (Game1.game1.takingMapScreenshot) return;
+            if (Game1.eventUp || Game1.farmEvent != null) return;
             if (config.hideAtFestivals && Game1.isFestival()) return;
             var spriteBatch = e.SpriteBatch;
             float topPx = marginTop;

@@ -5,6 +5,8 @@
 
 * Add import and export console commands
 
+* Add `offsetX` and `offsetY` config properties for the overlay.
+
 ## Version 1.8.4
 
 * Make weeks start on Monday (not Sunday) to match the game calendar.

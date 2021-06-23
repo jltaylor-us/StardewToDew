@@ -25,6 +25,7 @@ namespace ToDew {
             All = -1
         };
 
+        #pragma warning disable format
         [Flags]
         public enum DayVisibility {
             None = 0,
@@ -45,6 +46,7 @@ namespace ToDew {
             Week4     = 0b1000_0000_00000000,
             All = -1
         }
+        #pragma warning restore format
 
         /// <summary>
         /// The data model for an item on the to-do list.

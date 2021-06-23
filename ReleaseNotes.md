@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.9.0
+
+* Add import and export console commands
+
 ## Version 1.8.4
 
 * Make weeks start on Monday (not Sunday) to match the game calendar.

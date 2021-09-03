@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.9.1
+
+* Add Korean translation provided by nexusmods user primarina0220.
+
 ## Version 1.9.0
 
 * Add import and export console commands

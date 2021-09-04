@@ -33,11 +33,11 @@
     "message.host-old-data-format": "L'hôte utilise la version de format de données {{hostVersion}}, qui est plus ancienne que la version de format actuelle ({{myVersion}}). Certaines fonctionnalités peuvent ne pas être disponibles.",
     "message.current-item-deleted": "L'élément {{itemId}} a été supprimé par un autre joueur",
 
-    // menu liste
+    // Menu liste
     "menu.list.title-bold-part": "Liste To-Dew",
     "menu.list.title-rest": "pour la ferme {{farmName}}",
-    "menu.textbox.title": "Ajouter un élément à faire", // pas sûr que le TitleText apparaisse réellement n'importe où
-    // menu de configuration de l'élément (modifier)
+    "menu.textbox.title": "Ajouter un élément à faire", // Pas sûr que TitleText apparaisse réellement quelque part
+    // Menu de configuration de l'élément (modifier)
     "menu.edit.title": "Édition de l'élément",
     "menu.edit.header": "En-tête",
     "menu.edit.bold": "Gras",
@@ -48,11 +48,11 @@
     "menu.edit.not-raining-on-farm": "Il ne pleut pas à la ferme",
     "menu.edit.raining-on-island": "Il pleut sur l'île",
     "menu.edit.not-raining-on-island": "Il ne pleut pas sur l'île",
-    "menu.edit.only-days": "Afficher uniquement ces jours-ci :",
-    "menu.edit.week": "Semaine :",
-    "menu.edit.only-season": "Afficher uniquement dans :", //Provoque un dépassement de "Hiver" dans le bouton OK, à réduire de taille si possible
+    "menu.edit.only-days": "Jours :",
+    "menu.edit.week": "Semaines :",
+    "menu.edit.only-season": "Saisons :",
 
-    // noms des jours complets (puisque le jeu n'a que des traductions pour les noms courts)
+    // Noms des jours complets (puisque le jeu n'a que des traductions pour les noms abrégés)
     "sunday": "Dimanche",
     "monday": "Lundi",
     "tuesday": "Mardi",

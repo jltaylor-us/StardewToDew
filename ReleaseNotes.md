@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.9.2
+
+* Updated French translation provided by GitHub user Tenebrosful.
+
 ## Version 1.9.1
 
 * Add Korean translation provided by nexusmods user primarina0220.

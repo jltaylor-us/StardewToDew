@@ -3,7 +3,7 @@
 
 ## Version 1.9.3
 
-* Scroll indicators in the mail list now also function as buttons.
+* Scroll indicators in the main list now also function as buttons.
 
 ## Version 1.9.2
 

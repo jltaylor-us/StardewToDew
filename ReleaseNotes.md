@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.9.3
+
+* Scroll indicators in the mail list now also function as buttons.
+
 ## Version 1.9.2
 
 * Updated French translation provided by GitHub user Tenebrosful.

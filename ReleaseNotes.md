@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 1.9.4
+
+* Updated Chinese translation. (Thanks to Thomas Chen, github user cwt9562.)
+
 ## Version 1.9.3
 
 * Scroll indicators in the main list now also function as buttons.

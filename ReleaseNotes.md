@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 1.11.0
+
+* Updated Spanish translation (thanks to GitHub user Yllelder)
+* 
+
 ## Version 1.10.0
 
 * Built for SDV 1.5.5 / SMAPI 3.13

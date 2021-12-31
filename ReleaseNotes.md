@@ -1,10 +1,11 @@
 
 # Release Notes
 
-## Version 1.11.0
+## Version 1.10.1
 
 * Updated Spanish translation (thanks to GitHub user Yllelder)
-* 
+* Update to use new Generic Mod Config Menu API.  I18n now works in the config menu.
+* Update build environment to use ModTranslationClassBuilder v2.0.0
 
 ## Version 1.10.0
 

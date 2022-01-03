@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Upcoming Version
+
+* Work correctly when the same key is used for the hotkey and secondary close button
+  (previously it would immediately close the just-opened menu)
+
 ## Version 1.10.1
 
 * Updated Spanish translation (thanks to GitHub user Yllelder)

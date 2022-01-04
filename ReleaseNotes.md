@@ -3,6 +3,8 @@
 
 ## Upcoming Version
 
+* Overlay background and text color can now be configured in-game if both
+  Generic Mod Config Menu and GMCM Options are installed
 * Work correctly when the same key is used for the hotkey and secondary close button
   (previously it would immediately close the just-opened menu)
 

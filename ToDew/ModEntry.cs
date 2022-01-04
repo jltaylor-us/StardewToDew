@@ -45,6 +45,10 @@ namespace ToDew {
             // integrate with Generic Mod Config Menu, if installed
             var api = Helper.ModRegistry.GetApi<GenericModConfigMenuAPI>("spacechase0.GenericModConfigMenu");
             if (api != null) {
+                var apiExt = Helper.ModRegistry.GetApi<GMCMOptionsAPI>("jltaylor-us.GMCMOptions");
+                if (apiExt is null) {
+                    Monitor.Log(I18n.Message_InstallGmcmOptions(modName: ModManifest.Name), LogLevel.Info);
+                }
                 api.Register(
                     mod: ModManifest,
                     reset: () => config = new ModConfig(),
@@ -67,7 +71,7 @@ namespace ToDew {
                     tooltip: I18n.Config_Debug_Desc,
                     getValue: () => config.debug,
                     setValue: (bool val) => config.debug = val);
-                OverlayConfig.RegisterConfigMenuOptions(() => config.overlay, api, ModManifest);
+                OverlayConfig.RegisterConfigMenuOptions(() => config.overlay, api, apiExt, ModManifest);
             }
 
             // integrate with MobilePhone, if installed
@@ -311,6 +315,24 @@ Other flags:
         //void RegisterSimpleOption(IManifest mod, string optionName, string optionDesc, Func<SButton> optionGet, Action<SButton> optionSet);
         void AddNumberOption(IManifest mod, Func<int> getValue, Action<int> setValue, Func<string> name, Func<string> tooltip = null, int? min = null, int? max = null, int? interval = null, string fieldId = null);
         //void RegisterSimpleOption(IManifest mod, string optionName, string optionDesc, Func<int> optionGet, Action<int> optionSet);
+    }
+    // See https://github.com/jltaylor-us/StardewGMCMOptions/blob/default/StardewGMCMOptions/IGMCMOptionsAPI.cs
+    public interface GMCMOptionsAPI {
+        void AddColorOption(IManifest mod, Func<Color> getValue, Action<Color> setValue, Func<string> name,
+            Func<string> tooltip = null, bool showAlpha = true, uint colorPickerStyle = 0, string fieldId = null);
+        #pragma warning disable format
+        [Flags]
+        public enum ColorPickerStyle : uint {
+            Default = 0,
+            RGBSliders    = 0b00000001,
+            HSVColorWheel = 0b00000010,
+            HSLColorWheel = 0b00000100,
+            AllStyles     = 0b11111111,
+            NoChooser     = 0,
+            RadioChooser  = 0b01 << 8,
+            ToggleChooser = 0b10 << 8
+        }
+        #pragma warning restore format
     }
     // See https://www.nexusmods.com/stardewvalley/articles/467
     public interface IMobilePhoneApi {

@@ -21,7 +21,7 @@ namespace ToDew {
         public Color textColor = Color.White * 0.8f;
         public int offsetX = 0;
         public int offsetY = 0;
-        public static void RegisterConfigMenuOptions(Func<OverlayConfig> getThis, GenericModConfigMenuAPI api, IManifest modManifest) {
+        public static void RegisterConfigMenuOptions(Func<OverlayConfig> getThis, GenericModConfigMenuAPI api, GMCMOptionsAPI apiExt, IManifest modManifest) {
             api.AddSectionTitle(modManifest, I18n.Config_Overlay, I18n.Config_Overlay_Desc);
             api.AddBoolOption(
                 mod: modManifest,
@@ -53,6 +53,22 @@ namespace ToDew {
                 tooltip: I18n.Config_Overlay_MaxItems_Desc,
                 getValue: () => getThis().maxItems,
                 setValue: (int val) => getThis().maxItems = val);
+            if (apiExt is not null) {
+                apiExt.AddColorOption(
+                    mod: modManifest,
+                    name: I18n.Config_Overlay_BackgroundColor,
+                    tooltip: I18n.Config_Overlay_BackgroundColor_Desc,
+                    getValue: () => getThis().backgroundColor,
+                    setValue: (c) => getThis().backgroundColor = c,
+                    colorPickerStyle: (uint)(GMCMOptionsAPI.ColorPickerStyle.AllStyles | GMCMOptionsAPI.ColorPickerStyle.RadioChooser));
+                apiExt.AddColorOption(
+                    mod: modManifest,
+                    name: I18n.Config_Overlay_TextColor,
+                    tooltip: I18n.Config_Overlay_TextColor_Desc,
+                    getValue: () => getThis().textColor,
+                    setValue: (c) => getThis().textColor = c,
+                    colorPickerStyle: (uint)(GMCMOptionsAPI.ColorPickerStyle.AllStyles | GMCMOptionsAPI.ColorPickerStyle.RadioChooser));
+            }
         }
     }
     public class ToDoOverlay : IDisposable {

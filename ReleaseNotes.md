@@ -1,7 +1,7 @@
 
 # Release Notes
 
-## Upcoming Version
+## Version 1.10.2
 
 * Overlay background and text color can now be configured in-game if both
   Generic Mod Config Menu and GMCM Options are installed

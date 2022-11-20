@@ -21,6 +21,7 @@ namespace ToDew {
         public Color textColor = Color.White * 0.8f;
         public int offsetX = 0;
         public int offsetY = 0;
+        public bool scaleWithUI = false;
         public static void RegisterConfigMenuOptions(Func<OverlayConfig> getThis, GenericModConfigMenuAPI api, GMCMOptionsAPI apiExt, IManifest modManifest) {
             api.AddSectionTitle(modManifest, I18n.Config_Overlay, I18n.Config_Overlay_Desc);
             api.AddBoolOption(
@@ -94,6 +95,7 @@ namespace ToDew {
             ListHeaderSize = font.MeasureString(ListHeader);
             // initialize rendering callback
             theMod.Helper.Events.Display.RenderedWorld += OnRenderedWorld;
+            theMod.Helper.Events.Display.RenderingHud += OnRenderingHud;
             // initialize the list UI and callback
             theList.OnChanged += OnListChanged;
             syncMenuItemList();
@@ -143,17 +145,20 @@ namespace ToDew {
         public void Dispose() {
             this.theList.OnChanged -= OnListChanged;
             theMod.Helper.Events.Display.RenderedWorld -= OnRenderedWorld;
+            theMod.Helper.Events.Display.RenderingHud -= OnRenderingHud;
         }
 
-        private void OnRenderedWorld(object sender, RenderedWorldEventArgs e) {
+        private void Draw(SpriteBatch spriteBatch) {
             if (lines.Count == 0) return;
             if (!config.enabled) return; // shouldn't get this far, but why not check anyway
             if (Game1.game1.takingMapScreenshot) return;
             if (Game1.eventUp || Game1.farmEvent != null) return;
             if (config.hideAtFestivals && Game1.isFestival()) return;
-            var spriteBatch = e.SpriteBatch;
             Rectangle effectiveBounds = bounds;
-            if (Game1.CurrentMineLevel > 0 || Game1.currentLocation is VolcanoDungeon vd && vd.level.Value > 0) {
+            if (Game1.CurrentMineLevel > 0
+                || Game1.currentLocation is VolcanoDungeon vd && vd.level.Value > 0
+                || Game1.currentLocation is Club)
+            {
                 effectiveBounds.Y += 80;
             }
             float topPx = effectiveBounds.Y + marginTop;
@@ -173,5 +178,12 @@ namespace ToDew {
             }
         }
 
+        private void OnRenderedWorld(object sender, RenderedWorldEventArgs e) {
+            if (!config.scaleWithUI) Draw(e.SpriteBatch);
+        }
+
+        private void OnRenderingHud(object sender, RenderingHudEventArgs e) {
+            if (config.scaleWithUI) Draw(e.SpriteBatch);
+        }
     }
 }

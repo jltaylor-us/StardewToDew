@@ -187,7 +187,12 @@ namespace ToDew {
                 || Game1.currentLocation is VolcanoDungeon vd && vd.level.Value > 0
                 || Game1.currentLocation is Club)
             {
-                effectiveBounds.Y += 80;
+                int adjust = Game1.uiMode ? (int)MathF.Ceiling(80f * Game1.options.zoomLevel / Game1.options.uiScale) : 80;
+                effectiveBounds.Y = Math.Max(effectiveBounds.Y, adjust);
+            }
+            if (Game1.isOutdoorMapSmallerThanViewport()) {
+                effectiveBounds.X = Math.Max(effectiveBounds.X, -Game1.uiViewport.X);
+                effectiveBounds.Y = Math.Max(effectiveBounds.Y, -Game1.uiViewport.Y);
             }
             float topPx = effectiveBounds.Y + marginTop;
             float leftPx = effectiveBounds.X + marginLeft;

@@ -1,6 +1,8 @@
 ﻿// Copyright 2021 Jamie Taylor
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -54,6 +56,26 @@ namespace ToDew {
                 tooltip: I18n.Config_Overlay_MaxItems_Desc,
                 getValue: () => getThis().maxItems,
                 setValue: (int val) => getThis().maxItems = val);
+            api.AddNumberOption(
+                mod: modManifest,
+                name: I18n.Config_Overlay_XOffset,
+                tooltip: I18n.Config_Overlay_XOffset_Desc,
+                getValue: () => getThis().offsetX,
+                setValue: (int val) => getThis().offsetX = val);
+            api.AddNumberOption(
+                mod: modManifest,
+                name: I18n.Config_Overlay_YOffset,
+                tooltip: I18n.Config_Overlay_YOffset_Desc,
+                getValue: () => getThis().offsetY,
+                setValue: (int val) => getThis().offsetY = val);
+            api.AddTextOption(
+                mod: modManifest,
+                name: I18n.Config_Overlay_Zoom,
+                tooltip: I18n.Config_Overlay_Zoom_Desc,
+                getValue: () => getThis().scaleWithUI ? "OptionsPage_UIScale" : "OptionsPage.cs.11254",
+                setValue: (string val) => getThis().scaleWithUI = "OptionsPage_UIScale" == val,
+                allowedValues: new[] { "OptionsPage_UIScale", "OptionsPage.cs.11254" },
+                formatAllowedValue: (string val) => Game1.content.LoadString("Strings\\StringsFromCSFiles:" + val));
             if (apiExt is not null) {
                 apiExt.AddColorOption(
                     mod: modManifest,
@@ -141,6 +163,12 @@ namespace ToDew {
         private void OnListChanged(object sender, List<ToDoList.ListItem> e) {
             syncMenuItemList();
         }
+
+        internal void ConfigSaved() {
+            bounds.X = config.offsetX;
+            bounds.Y = config.offsetY;
+        }
+
 
         public void Dispose() {
             this.theList.OnChanged -= OnListChanged;

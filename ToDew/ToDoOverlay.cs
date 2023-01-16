@@ -15,6 +15,7 @@ using StardewValley.Locations;
 namespace ToDew {
     public class OverlayConfig {
         public bool enabled = true;
+        public bool clickToMarkDone = true;
         public SButton hotkey = SButton.None;
         public KeybindList hotkeyList = new KeybindList();
         public bool hideAtFestivals = false;
@@ -33,6 +34,12 @@ namespace ToDew {
                 tooltip: I18n.Config_Overlay_Enabled_Desc,
                 getValue: () => getThis().enabled,
                 setValue: (bool val) => getThis().enabled = val);
+            api.AddBoolOption(
+                mod: modManifest,
+                name: I18n.Config_Overlay_ClickToMarkDone,
+                tooltip: I18n.Config_Overlay_ClickToMarkDone_Desc,
+                getValue: () => getThis().clickToMarkDone,
+                setValue: (bool val) => getThis().clickToMarkDone = val);
             api.AddKeybind(
                 mod: modManifest,
                 name: I18n.Config_Overlay_Hotkey,
@@ -107,10 +114,11 @@ namespace ToDew {
         private const int lineSpacing = 5;
         private readonly SpriteFont font = Game1.smallFont;
         private readonly Vector2 ListHeaderSize;
-        private List<String> lines;
-        private List<float> lineHeights;
-        private List<bool> lineBold;
         private Rectangle bounds;
+        internal record struct Line(ToDoList.ListItem? Item, string Text, bool Bold, float Top, float Height, bool hasDoneButton);
+        private List<Line> lines;
+        private ToDoList.ListItem? mouseCurrentlyOverDoneButtonForItem;
+        private static readonly Rectangle doneButtonSource = new(340, 410, 24, 10);
         public ToDoOverlay(ModEntry theMod, ToDoList theList) {
             this.theMod = theMod;
             this.theList = theList;
@@ -121,16 +129,14 @@ namespace ToDew {
             theMod.Helper.Events.Display.RenderingHud += OnRenderingHud;
             // initialize the list UI and callback
             theList.OnChanged += OnListChanged;
+            // initialize the handler for clicking the "done" button
+            theMod.Helper.Events.Input.ButtonPressed += OnButtonPressed;
             syncMenuItemList();
         }
 
         [MemberNotNull(nameof(lines))]
-        [MemberNotNull(nameof(lineHeights))]
-        [MemberNotNull(nameof(lineBold))]
         private void syncMenuItemList() {
-            lines = new List<string>();
-            lineHeights = new List<float>();
-            lineBold = new List<bool>();
+            lines = new List<Line>();
             if (theList.Items.Count == 0) return;
             float availableWidth = Math.Max(config.maxWidth - marginLeft - marginRight, ListHeaderSize.X);
             float usedWidth = ListHeaderSize.X;
@@ -138,10 +144,8 @@ namespace ToDew {
             foreach (var item in theList.Items) {
                 if (item.IsDone || item.HideInOverlay || ! item.IsVisibleToday) continue;
                 if (lines.Count >= config.maxItems) {
-                    lines.Add("…");
                     float lineHeight = font.MeasureString("…").Y;
-                    lineHeights.Add(lineHeight);
-                    lineBold.Add(false);
+                    lines.Add(new Line(null, "…", Bold: false, topPx, lineHeight, hasDoneButton: false));
                     topPx += lineHeight;
                     break;
                 }
@@ -157,9 +161,7 @@ namespace ToDew {
                     lineSize = font.MeasureString(itemText);
                 }
                 usedWidth = Math.Max(usedWidth, lineSize.X);
-                lines.Add(itemText);
-                lineHeights.Add(lineSize.Y);
-                lineBold.Add(item.IsBold);
+                lines.Add(new Line(item, itemText, Bold: item.IsBold, topPx, lineSize.Y, hasDoneButton: !item.IsHeader));
                 topPx += lineSize.Y;
             }
             bounds = new Rectangle(config.offsetX, config.offsetY, (int)(usedWidth + marginLeft + marginRight), (int)topPx + marginBottom);
@@ -178,14 +180,19 @@ namespace ToDew {
             this.theList.OnChanged -= OnListChanged;
             theMod.Helper.Events.Display.RenderedWorld -= OnRenderedWorld;
             theMod.Helper.Events.Display.RenderingHud -= OnRenderingHud;
+            theMod.Helper.Events.Input.ButtonPressed -= OnButtonPressed;
         }
 
         private void Draw(SpriteBatch spriteBatch) {
-            if (lines.Count == 0) return;
-            if (!config.enabled) return; // shouldn't get this far, but why not check anyway
-            if (Game1.game1.takingMapScreenshot) return;
-            if (Game1.eventUp || Game1.farmEvent != null) return;
-            if (config.hideAtFestivals && Game1.isFestival()) return;
+            if (lines.Count == 0
+                || !config.enabled // shouldn't get this far, but why not check anyway
+                || Game1.game1.takingMapScreenshot
+                || Game1.eventUp || Game1.farmEvent != null
+                || (config.hideAtFestivals && Game1.isFestival()))
+            {
+                mouseCurrentlyOverDoneButtonForItem = null;
+                return;
+            }
             Rectangle effectiveBounds = bounds;
             if (Game1.CurrentMineLevel > 0
                 || Game1.currentLocation is VolcanoDungeon vd && vd.level.Value > 0
@@ -204,15 +211,34 @@ namespace ToDew {
             Utility.drawBoldText(spriteBatch, ListHeader, font, new Vector2(leftPx, topPx), config.textColor);
             topPx += ListHeaderSize.Y;
             spriteBatch.DrawLine(leftPx, topPx, new Vector2(ListHeaderSize.X - 3, 1), config.textColor);
+            int mouseX = Game1.getMouseX();
+            int mouseY = Game1.getMouseY();
+            ToDoList.ListItem? newMouseCurrentlyOverDoneButtonForItem = null;
             for (int i = 0; i < lines.Count; i++) {
                 topPx += lineSpacing;
-                if (lineBold[i]) {
-                    Utility.drawBoldText(spriteBatch, lines[i], font, new Vector2(leftPx, topPx), config.textColor);
+                if (lines[i].Bold) {
+                    Utility.drawBoldText(spriteBatch, lines[i].Text, font, new Vector2(leftPx, topPx), config.textColor);
                 } else {
-                    spriteBatch.DrawString(font, lines[i], new Vector2(leftPx, topPx), config.textColor);
+                    spriteBatch.DrawString(font, lines[i].Text, new Vector2(leftPx, topPx), config.textColor);
                 }
-                topPx += lineHeights[i];
+                if (config.clickToMarkDone
+                    && lines[i].hasDoneButton
+                    && (effectiveBounds.Left <= mouseX && mouseX < effectiveBounds.Right)
+                    && (topPx <= mouseY && mouseY < topPx + lines[i].Height)) {
+                    const int doneScale = 2;
+                    //int doneLeft = effectiveBounds.Right - marginRight - doneScale * doneButtonSource.Width;
+                    int doneLeft = effectiveBounds.Left + marginLeft;
+                    Rectangle doneRect = new Rectangle(doneLeft,
+                        (int)(topPx + (lines[i].Height - doneButtonSource.Height * doneScale) / 2),
+                        doneButtonSource.Width * doneScale,
+                        doneButtonSource.Height * doneScale);
+                    bool mouseInDoneButton = doneRect.Contains(mouseX, mouseY);
+                    newMouseCurrentlyOverDoneButtonForItem = mouseInDoneButton ? lines[i].Item : null;
+                    spriteBatch.DrawSprite(Game1.mouseCursors, doneButtonSource, doneRect.Left, doneRect.Top, null, mouseInDoneButton ? 1.2f * (float)doneScale : (float)doneScale);
+                }
+                topPx += lines[i].Height;
             }
+            mouseCurrentlyOverDoneButtonForItem = newMouseCurrentlyOverDoneButtonForItem;
         }
 
         private void OnRenderedWorld(object? sender, RenderedWorldEventArgs e) {
@@ -221,6 +247,14 @@ namespace ToDew {
 
         private void OnRenderingHud(object? sender, RenderingHudEventArgs e) {
             if (config.scaleWithUI) Draw(e.SpriteBatch);
+        }
+
+        private void OnButtonPressed(object? sender, ButtonPressedEventArgs e) {
+            if (mouseCurrentlyOverDoneButtonForItem is not null && e.Button is SButton.MouseLeft) {
+                theList.SetItemDone(mouseCurrentlyOverDoneButtonForItem, true);
+                Game1.playSound("coin");
+                theMod.Helper.Input.Suppress(SButton.MouseLeft);
+            }
         }
     }
 }

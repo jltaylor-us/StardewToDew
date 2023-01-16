@@ -2,6 +2,7 @@
 // Portions Copyright 2016–2019 Pathoschild and other contributors, see NOTICE for license
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -396,7 +397,7 @@ namespace ToDew {
             }
             public void receiveClick(int mouseX, int mouseY, ToDoList theList) {
                 if (okButton.Contains(mouseX, mouseY)) {
-                    menu.exitItemConfig();
+                    menu.exitItemConfig(this);
                     return;
                 }
                 if (headerCheckbox.Contains(mouseX, mouseY)) {
@@ -484,7 +485,7 @@ namespace ToDew {
         private readonly ModEntry theMod;
         private readonly ToDoList theList;
         private List<MenuItem> menuItemList;
-        private ItemConfigMenu currentItemEditor;
+        private ItemConfigMenu? currentItemEditor;
 
         private readonly TextBox Textbox;
         /// <summary>The maximum pixels to scroll.</summary>
@@ -539,6 +540,7 @@ namespace ToDew {
             syncMenuItemList();
         }
 
+        [MemberNotNull(nameof(menuItemList))]
         private void syncMenuItemList() {
             var items = theList.Items;
             var itemCount = items.Count;
@@ -688,13 +690,14 @@ namespace ToDew {
                 if (key.Equals(Keys.Escape)
                     || this.theMod.config.secondaryCloseButton.Equals(key.ToSButton())
                     || key.Equals(Keys.Enter)) {
-                    exitItemConfig();
+                    exitItemConfig(currentItemEditor);
                 }
             }
         }
-        private void exitItemConfig() {
-            if (!currentItemEditor.todoItem.Text.Equals(Textbox.Text)) {
-                theList.SetItemText(currentItemEditor.todoItem, Textbox.Text);
+        private void exitItemConfig(ItemConfigMenu closingItemEditor) {
+            // take closingItemEditor as arg rather than using member var because the call sites do the null check
+            if (!closingItemEditor.todoItem.Text.Equals(Textbox.Text)) {
+                theList.SetItemText(closingItemEditor.todoItem, Textbox.Text);
             }
             Game1.playSound("coin");
             currentItemEditor = null;
@@ -709,7 +712,7 @@ namespace ToDew {
                 if (currentItemEditor == null) {
                     this.exitThisMenu();
                 } else {
-                    exitItemConfig();
+                    exitItemConfig(currentItemEditor);
                 }
             } else {
                 base.receiveGamePadButton(b);
@@ -767,7 +770,7 @@ namespace ToDew {
             }
         }
 
-        private void OnListChanged(object sender, List<ToDoList.ListItem> e) {
+        private void OnListChanged(object? sender, List<ToDoList.ListItem> e) {
             syncMenuItemList();
         }
 

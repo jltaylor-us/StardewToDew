@@ -1,6 +1,7 @@
 ﻿// Copyright 2021 Jamie Taylor
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Xna.Framework;
@@ -24,7 +25,7 @@ namespace ToDew {
         public int offsetX = 0;
         public int offsetY = 0;
         public bool scaleWithUI = false;
-        public static void RegisterConfigMenuOptions(Func<OverlayConfig> getThis, GenericModConfigMenuAPI api, GMCMOptionsAPI apiExt, IManifest modManifest) {
+        public static void RegisterConfigMenuOptions(Func<OverlayConfig> getThis, GenericModConfigMenuAPI api, GMCMOptionsAPI? apiExt, IManifest modManifest) {
             api.AddSectionTitle(modManifest, I18n.Config_Overlay, I18n.Config_Overlay_Desc);
             api.AddBoolOption(
                 mod: modManifest,
@@ -123,6 +124,9 @@ namespace ToDew {
             syncMenuItemList();
         }
 
+        [MemberNotNull(nameof(lines))]
+        [MemberNotNull(nameof(lineHeights))]
+        [MemberNotNull(nameof(lineBold))]
         private void syncMenuItemList() {
             lines = new List<string>();
             lineHeights = new List<float>();
@@ -160,7 +164,7 @@ namespace ToDew {
             }
             bounds = new Rectangle(config.offsetX, config.offsetY, (int)(usedWidth + marginLeft + marginRight), (int)topPx + marginBottom);
         }
-        private void OnListChanged(object sender, List<ToDoList.ListItem> e) {
+        private void OnListChanged(object? sender, List<ToDoList.ListItem> e) {
             syncMenuItemList();
         }
 
@@ -211,11 +215,11 @@ namespace ToDew {
             }
         }
 
-        private void OnRenderedWorld(object sender, RenderedWorldEventArgs e) {
+        private void OnRenderedWorld(object? sender, RenderedWorldEventArgs e) {
             if (!config.scaleWithUI) Draw(e.SpriteBatch);
         }
 
-        private void OnRenderingHud(object sender, RenderingHudEventArgs e) {
+        private void OnRenderingHud(object? sender, RenderingHudEventArgs e) {
             if (config.scaleWithUI) Draw(e.SpriteBatch);
         }
     }

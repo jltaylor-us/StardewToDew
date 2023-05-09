@@ -106,24 +106,20 @@ namespace ToDew {
         private readonly ModEntry theMod;
         private readonly ToDoList theList;
         private OverlayConfig config { get => theMod.config.overlay; }
-        private string ListHeader = I18n.Overlay_Header();
         private const int marginTop = 5;
         private const int marginLeft = 5;
         private const int marginRight = 5;
         private const int marginBottom = 5;
         private const int lineSpacing = 5;
         private readonly SpriteFont font = Game1.smallFont;
-        private readonly Vector2 ListHeaderSize;
         private Rectangle bounds;
-        internal record struct Line(ToDoList.ListItem? Item, string Text, bool Bold, float Top, float Height, bool hasDoneButton);
+        internal record struct Line(Action? onDone, string Text, bool Bold, bool Underline, float Top, Vector2 Size, bool hasDoneButton);
         private List<Line> lines;
-        private ToDoList.ListItem? mouseCurrentlyOverDoneButtonForItem;
+        private Action? mouseCurrentlyOverDoneButtonWithAction;
         private static readonly Rectangle doneButtonSource = new(340, 410, 24, 10);
         public ToDoOverlay(ModEntry theMod, ToDoList theList) {
             this.theMod = theMod;
             this.theList = theList;
-            // save "constant" values
-            ListHeaderSize = font.MeasureString(ListHeader);
             // initialize rendering callback
             theMod.Helper.Events.Display.RenderedWorld += OnRenderedWorld;
             theMod.Helper.Events.Display.RenderingHud += OnRenderingHud;
@@ -138,33 +134,40 @@ namespace ToDew {
         private void syncMenuItemList() {
             lines = new List<Line>();
             if (theList.Items.Count == 0) return;
-            float availableWidth = Math.Max(config.maxWidth - marginLeft - marginRight, ListHeaderSize.X);
-            float usedWidth = ListHeaderSize.X;
-            float topPx = marginTop + ListHeaderSize.Y;
+            float availableWidth = config.maxWidth - marginLeft - marginRight;
+            (var sectionHeaderText, var sectionHeaderSize) = MaybeTruncate(I18n.Overlay_Header(), availableWidth);
+            float usedWidth = sectionHeaderSize.X;
+            float topPx = marginTop;
+            lines.Add(new Line(null, sectionHeaderText, Bold: true, Underline: true, topPx, sectionHeaderSize, hasDoneButton: false));
+            topPx += sectionHeaderSize.Y;
             foreach (var item in theList.Items) {
                 if (item.IsDone || item.HideInOverlay || ! item.IsVisibleToday) continue;
                 if (lines.Count >= config.maxItems) {
-                    float lineHeight = font.MeasureString("…").Y;
-                    lines.Add(new Line(null, "…", Bold: false, topPx, lineHeight, hasDoneButton: false));
-                    topPx += lineHeight;
+                    Vector2 size = font.MeasureString("…");
+                    lines.Add(new Line(null, "…", Bold: false, Underline: false, topPx, size, hasDoneButton: false));
+                    topPx += size.Y;
                     break;
                 }
                 topPx += lineSpacing;
                 string itemText = item.IsHeader ? item.Text : ("  " + item.Text);
-                var lineSize = font.MeasureString(itemText);
-                while (lineSize.X > availableWidth) {
-                    if (itemText.Length < 2) {
-                        // this really shouldn't happen
-                        break;
-                    }
-                    itemText = itemText.Remove(itemText.Length - 2) + "…";
-                    lineSize = font.MeasureString(itemText);
-                }
+                (itemText, var lineSize) = MaybeTruncate(itemText, availableWidth);
                 usedWidth = Math.Max(usedWidth, lineSize.X);
-                lines.Add(new Line(item, itemText, Bold: item.IsBold, topPx, lineSize.Y, hasDoneButton: !item.IsHeader));
+                lines.Add(new Line(() => theList.SetItemDone(item, true), itemText, Bold: item.IsBold, Underline: false, topPx, lineSize, hasDoneButton: !item.IsHeader));
                 topPx += lineSize.Y;
             }
             bounds = new Rectangle(config.offsetX, config.offsetY, (int)(usedWidth + marginLeft + marginRight), (int)topPx + marginBottom);
+        }
+        private (string, Vector2) MaybeTruncate(string itemText, float availableWidth) {
+            var lineSize = font.MeasureString(itemText);
+            while (lineSize.X > availableWidth) {
+                if (itemText.Length < 2) {
+                    // this really shouldn't happen
+                    break;
+                }
+                itemText = itemText.Remove(itemText.Length - 2) + "…";
+                lineSize = font.MeasureString(itemText);
+            }
+            return (itemText, lineSize);
         }
         private void OnListChanged(object? sender, List<ToDoList.ListItem> e) {
             syncMenuItemList();
@@ -190,7 +193,7 @@ namespace ToDew {
                 || Game1.eventUp || Game1.farmEvent != null
                 || (config.hideAtFestivals && Game1.isFestival()))
             {
-                mouseCurrentlyOverDoneButtonForItem = null;
+                mouseCurrentlyOverDoneButtonWithAction = null;
                 return;
             }
             Rectangle effectiveBounds = bounds;
@@ -208,12 +211,9 @@ namespace ToDew {
             float topPx = effectiveBounds.Y + marginTop;
             float leftPx = effectiveBounds.X + marginLeft;
             spriteBatch.Draw(Game1.fadeToBlackRect, effectiveBounds, config.backgroundColor);
-            Utility.drawBoldText(spriteBatch, ListHeader, font, new Vector2(leftPx, topPx), config.textColor);
-            topPx += ListHeaderSize.Y;
-            spriteBatch.DrawLine(leftPx, topPx, new Vector2(ListHeaderSize.X - 3, 1), config.textColor);
             int mouseX = Game1.getMouseX();
             int mouseY = Game1.getMouseY();
-            ToDoList.ListItem? newMouseCurrentlyOverDoneButtonForItem = null;
+            Action? newMouseCurrentlyOverDoneButtonForItem = null;
             for (int i = 0; i < lines.Count; i++) {
                 topPx += lineSpacing;
                 if (lines[i].Bold) {
@@ -221,24 +221,27 @@ namespace ToDew {
                 } else {
                     spriteBatch.DrawString(font, lines[i].Text, new Vector2(leftPx, topPx), config.textColor);
                 }
+                if (lines[i].Underline) {
+                    spriteBatch.DrawLine(leftPx, topPx + lines[i].Size.Y, new Vector2(lines[i].Size.X - 3, 1), config.textColor);
+                }
                 if (config.clickToMarkDone
                     && lines[i].hasDoneButton
                     && (effectiveBounds.Left <= mouseX && mouseX < effectiveBounds.Right)
-                    && (topPx <= mouseY && mouseY < topPx + lines[i].Height)) {
+                    && (topPx <= mouseY && mouseY < topPx + lines[i].Size.Y)) {
                     const int doneScale = 2;
                     //int doneLeft = effectiveBounds.Right - marginRight - doneScale * doneButtonSource.Width;
                     int doneLeft = effectiveBounds.Left + marginLeft;
                     Rectangle doneRect = new Rectangle(doneLeft,
-                        (int)(topPx + (lines[i].Height - doneButtonSource.Height * doneScale) / 2),
+                        (int)(topPx + (lines[i].Size.Y - doneButtonSource.Height * doneScale) / 2),
                         doneButtonSource.Width * doneScale,
                         doneButtonSource.Height * doneScale);
                     bool mouseInDoneButton = doneRect.Contains(mouseX, mouseY);
-                    newMouseCurrentlyOverDoneButtonForItem = mouseInDoneButton ? lines[i].Item : null;
+                    newMouseCurrentlyOverDoneButtonForItem = mouseInDoneButton ? lines[i].onDone : null;
                     spriteBatch.DrawSprite(Game1.mouseCursors, doneButtonSource, doneRect.Left, doneRect.Top, null, mouseInDoneButton ? 1.2f * (float)doneScale : (float)doneScale);
                 }
-                topPx += lines[i].Height;
+                topPx += lines[i].Size.Y;
             }
-            mouseCurrentlyOverDoneButtonForItem = newMouseCurrentlyOverDoneButtonForItem;
+            mouseCurrentlyOverDoneButtonWithAction = newMouseCurrentlyOverDoneButtonForItem;
         }
 
         private void OnRenderedWorld(object? sender, RenderedWorldEventArgs e) {
@@ -250,8 +253,8 @@ namespace ToDew {
         }
 
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e) {
-            if (mouseCurrentlyOverDoneButtonForItem is not null && e.Button is SButton.MouseLeft) {
-                theList.SetItemDone(mouseCurrentlyOverDoneButtonForItem, true);
+            if (mouseCurrentlyOverDoneButtonWithAction is not null && e.Button is SButton.MouseLeft) {
+                mouseCurrentlyOverDoneButtonWithAction.Invoke();
                 Game1.playSound("coin");
                 theMod.Helper.Input.Suppress(SButton.MouseLeft);
             }

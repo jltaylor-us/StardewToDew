@@ -104,7 +104,7 @@ namespace ToDew {
     }
     public class ToDoOverlay : IDisposable {
         private readonly ModEntry theMod;
-        private readonly ToDoList theList;
+        private readonly OverlayDataSources dataSources;
         private OverlayConfig config { get => theMod.config.overlay; }
         private const int marginTop = 5;
         private const int marginLeft = 5;
@@ -117,14 +117,14 @@ namespace ToDew {
         private List<Line> lines;
         private Action? mouseCurrentlyOverDoneButtonWithAction;
         private static readonly Rectangle doneButtonSource = new(340, 410, 24, 10);
-        public ToDoOverlay(ModEntry theMod, ToDoList theList) {
+        public ToDoOverlay(ModEntry theMod, OverlayDataSources dataSources) {
             this.theMod = theMod;
-            this.theList = theList;
+            this.dataSources = dataSources;
             // initialize rendering callback
             theMod.Helper.Events.Display.RenderedWorld += OnRenderedWorld;
             theMod.Helper.Events.Display.RenderingHud += OnRenderingHud;
             // initialize the list UI and callback
-            theList.OnChanged += OnListChanged;
+            dataSources.OnRefresh += OnListChanged;
             // initialize the handler for clicking the "done" button
             theMod.Helper.Events.Input.ButtonPressed += OnButtonPressed;
             syncMenuItemList();
@@ -133,27 +133,32 @@ namespace ToDew {
         [MemberNotNull(nameof(lines))]
         private void syncMenuItemList() {
             lines = new List<Line>();
-            if (theList.Items.Count == 0) return;
             float availableWidth = config.maxWidth - marginLeft - marginRight;
-            (var sectionHeaderText, var sectionHeaderSize) = MaybeTruncate(I18n.Overlay_Header(), availableWidth);
-            float usedWidth = sectionHeaderSize.X;
+            float usedWidth = 0;
             float topPx = marginTop;
-            lines.Add(new Line(null, sectionHeaderText, Bold: true, Underline: true, topPx, sectionHeaderSize, hasDoneButton: false));
-            topPx += sectionHeaderSize.Y;
-            foreach (var item in theList.Items) {
-                if (item.IsDone || item.HideInOverlay || ! item.IsVisibleToday) continue;
-                if (lines.Count >= config.maxItems) {
-                    Vector2 size = font.MeasureString("…");
-                    lines.Add(new Line(null, "…", Bold: false, Underline: false, topPx, size, hasDoneButton: false));
-                    topPx += size.Y;
-                    break;
+            foreach (var dataSource in dataSources.DataSources) {
+                int fetchLimit = config.maxItems + 2 - lines.Count; // + 1 for the first header, and + 1 so that we get the "..." at the end
+                var items = dataSource.GetItems(fetchLimit);
+                if (items.Count == 0) continue;
+                (var sectionHeaderText, var sectionHeaderSize) = MaybeTruncate(dataSource.GetSectionTitle(), availableWidth);
+                usedWidth = Math.Max(usedWidth, sectionHeaderSize.X);
+                if (lines.Count != 0) topPx += lineSpacing; // for sources that aren't the first source
+                lines.Add(new Line(null, sectionHeaderText, Bold: true, Underline: true, topPx, sectionHeaderSize, hasDoneButton: false));
+                topPx += sectionHeaderSize.Y;
+                foreach (var item in items) {
+                    if (lines.Count >= config.maxItems) {
+                        Vector2 size = font.MeasureString("…");
+                        lines.Add(new Line(null, "…", Bold: false, Underline: false, topPx, size, hasDoneButton: false));
+                        topPx += size.Y;
+                        break;
+                    }
+                    topPx += lineSpacing;
+                    (string itemText, var lineSize) = MaybeTruncate(item.text, availableWidth);
+                    usedWidth = Math.Max(usedWidth, lineSize.X);
+                    lines.Add(new Line(item.onDone, itemText, Bold: item.isBold, Underline: false, topPx, lineSize, hasDoneButton: item.onDone is not null));
+                    topPx += lineSize.Y;
                 }
-                topPx += lineSpacing;
-                string itemText = item.IsHeader ? item.Text : ("  " + item.Text);
-                (itemText, var lineSize) = MaybeTruncate(itemText, availableWidth);
-                usedWidth = Math.Max(usedWidth, lineSize.X);
-                lines.Add(new Line(() => theList.SetItemDone(item, true), itemText, Bold: item.IsBold, Underline: false, topPx, lineSize, hasDoneButton: !item.IsHeader));
-                topPx += lineSize.Y;
+                if (lines.Count >= config.maxItems) break;
             }
             bounds = new Rectangle(config.offsetX, config.offsetY, (int)(usedWidth + marginLeft + marginRight), (int)topPx + marginBottom);
         }
@@ -169,7 +174,7 @@ namespace ToDew {
             }
             return (itemText, lineSize);
         }
-        private void OnListChanged(object? sender, List<ToDoList.ListItem> e) {
+        private void OnListChanged() {
             syncMenuItemList();
         }
 
@@ -180,7 +185,7 @@ namespace ToDew {
 
 
         public void Dispose() {
-            this.theList.OnChanged -= OnListChanged;
+            this.dataSources.OnRefresh -= OnListChanged;
             theMod.Helper.Events.Display.RenderedWorld -= OnRenderedWorld;
             theMod.Helper.Events.Display.RenderingHud -= OnRenderingHud;
             theMod.Helper.Events.Input.ButtonPressed -= OnButtonPressed;

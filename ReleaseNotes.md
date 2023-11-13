@@ -1,6 +1,12 @@
 
 # Release Notes
 
+## Version 2.0.0
+
+* Built for SDV 1.6 / SMAPI 4.0.  No functionality changes, but
+  older versions will not work with SDV 1.6, and this version
+  will not work with older versions of SDV or SMAPI
+
 ## Version 1.14.1
 
 * Add Portugese translation provided by nexusmods user ericofurtado

@@ -1,0 +1,11 @@
+{
+    "Name": "To-Dew Mobile Phone Icon",
+    "Author": "Jamie Taylor",
+    "Version": "1.0.0",
+    "Description": "Replaces the Mobile Phone icon for To-Dew",
+    "UniqueID": "jltaylor-us.ToDew_MobilePhone_Icon",
+    "UpdateKeys": [ ],
+    "ContentPackFor": {
+        "UniqueID": "Pathoschild.ContentPatcher"
+    }
+}

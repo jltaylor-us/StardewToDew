@@ -1,0 +1,10 @@
+{
+    "Format": "1.29.0",
+    "Changes": [
+        {
+            "Action": "EditImage",
+            "Target": "Mods/jltaylor-us.ToDew/MobilePhoneIcon",
+            "FromFile": "icon.png"
+        }
+    ]
+}

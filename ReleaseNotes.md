@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 2.2.1
+
+* Added Polish translation from github user marcix99942
+
 ## Version 2.2.0
 
 * Built for SDV 1.6.10 / SMAPI 4.1.1.

@@ -48,7 +48,7 @@ namespace ToDew {
                     // this really shouldn't happen
                     api = new ToDoApiImpl(this, ModManifest);
                 }
-                ToDoListOverlayDataSource source = new(() => api.RefreshOverlay());
+                ToDoListOverlayDataSource source = new(this, () => api.RefreshOverlay());
                 api.AddOverlayDataSource(source);
                 return source;
             });

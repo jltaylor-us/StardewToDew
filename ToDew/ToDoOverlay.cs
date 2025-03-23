@@ -16,6 +16,7 @@ namespace ToDew {
     public class OverlayConfig {
         public bool enabled = true;
         public bool clickToMarkDone = true;
+        public bool hideHeaderWithNoChildren = false;
         public SButton hotkey = SButton.None;
         public KeybindList hotkeyList = new KeybindList();
         public bool hideAtFestivals = false;
@@ -40,6 +41,12 @@ namespace ToDew {
                 tooltip: I18n.Config_Overlay_ClickToMarkDone_Desc,
                 getValue: () => getThis().clickToMarkDone,
                 setValue: (bool val) => getThis().clickToMarkDone = val);
+            api.AddBoolOption(
+                mod: modManifest,
+                name: I18n.Config_Overlay_HideHeaderWithNoChildren,
+                tooltip: I18n.Config_Overlay_HideHeaderWithNoChildren_Desc,
+                getValue: () => getThis().hideHeaderWithNoChildren,
+                setValue: (bool val) => getThis().hideHeaderWithNoChildren = val);
             api.AddKeybind(
                 mod: modManifest,
                 name: I18n.Config_Overlay_Hotkey,

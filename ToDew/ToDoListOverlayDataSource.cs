@@ -1,10 +1,13 @@
 ﻿// Copyright 2023 Jamie Taylor
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ToDew {
     public class ToDoListOverlayDataSource : IToDewOverlayDataSource {
+        private readonly ModEntry theMod;
         private ToDoList? _theList;
+        private OverlayConfig config { get => theMod.config.overlay; }
         public ToDoList? theList {
             get => _theList;
             set {
@@ -18,7 +21,8 @@ namespace ToDew {
             }
         }
         private readonly Action refreshOverlay;
-        public ToDoListOverlayDataSource(Action refreshOverlay) {
+        public ToDoListOverlayDataSource(ModEntry theMod, Action refreshOverlay) {
+            this.theMod = theMod;
             this.refreshOverlay = refreshOverlay;
         }
 
@@ -29,11 +33,23 @@ namespace ToDew {
         public List<(string text, bool isBold, Action? onDone)> GetItems(int limit) {
             List<(string text, bool isBold, Action? onDone)> result = new();
             if (theList is null) return result;
+            bool lastIsHeader = false;
             foreach (var item in theList.Items) {
                 if (item.IsDone || item.HideInOverlay || !item.IsVisibleToday) continue;
-                string itemText = item.IsHeader ? item.Text : ("  " + item.Text);
-                result.Add((itemText, item.IsBold, item.IsHeader ? null : () => theList.SetItemDone(item, true)));
-                if (result.Count == limit) break;
+                if (item.IsHeader) {
+                    if (lastIsHeader && config.hideHeaderWithNoChildren) {
+                        result.RemoveAt(result.Count - 1);
+                    }
+                    lastIsHeader = true;
+                    result.Add(("  " + item.Text, item.IsBold, null));
+                } else {
+                    lastIsHeader = false;
+                    result.Add((item.Text, item.IsBold, () => theList.SetItemDone(item, true)));
+                    if (result.Count >= limit) break;
+                }
+            }
+            if (config.hideHeaderWithNoChildren && lastIsHeader) {
+                result.RemoveAt(result.Count - 1);
             }
             return result;
         }

@@ -6,7 +6,7 @@
 * Configuration changes now refresh the overlay list when the
   configuration is saved rather than being delayed until the next
   list refresh.
-* Added a overlay configuration option to hide items marked as
+* Added an overlay configuration option to hide items marked as
   "header" if they have no children (i.e., if the next visible
   item is also a header).
 

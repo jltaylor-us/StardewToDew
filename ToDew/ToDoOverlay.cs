@@ -179,6 +179,7 @@ namespace ToDew {
         }
 
         internal void ConfigSaved() {
+            syncMenuItemList();
             bounds.X = config.offsetX;
             bounds.Y = config.offsetY;
         }

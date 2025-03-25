@@ -199,7 +199,7 @@ namespace ToDew {
                 ToDoList.DayVisibility.Monday,
                 ToDoList.DayVisibility.Tuesday,
                 ToDoList.DayVisibility.Wednesday,
-                ToDoList.DayVisibility.Thurdsay,
+                ToDoList.DayVisibility.Thursday,
                 ToDoList.DayVisibility.Friday,
                 ToDoList.DayVisibility.Saturday,
                 ToDoList.DayVisibility.Sunday,

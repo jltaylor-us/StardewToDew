@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 2.4.1
+
+* Updated Vietnamese translation from nexusmods user Blazemc2k5
+
 ## Version 2.4.0
 
 * Updated Portuguese translation from GitHub user Lumisori

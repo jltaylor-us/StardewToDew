@@ -74,6 +74,11 @@
     "menu.edit.only-days": "Show Only on These Days:",
     "menu.edit.week": "Week:",
     "menu.edit.only-season": "Show only in:",
+    "menu.edit.host-gsq": "Host GSQ",
+    "menu.edit.player-gsq": "Player GSQ",
+    "menu.edit.refresh-on": "Refresh on:",
+    "menu.edit.refresh-location": "location change",
+    "menu.edit.refresh-time": "time change",
 
     // full day names (since the game only has translations for the short names)
     "sunday": "Sunday",

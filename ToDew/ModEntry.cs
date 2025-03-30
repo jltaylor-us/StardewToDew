@@ -223,10 +223,10 @@ namespace ToDew {
         }
 
         private void onTimeChanged(object? sender, TimeChangedEventArgs e) {
-            if (list.Value != null && list.Value.HostRefresh.HasFlag(ToDoList.RefreshOn.TimeChange)) {
+            if (list.Value != null && list.Value.HostRefresh.HasFlag(ToDoList.RefreshOn.Time)) {
                 list.Value.RefreshVisibility(false);
             }
-            if (list.Value != null && list.Value.PlayerRefresh.HasFlag(ToDoList.RefreshOn.TimeChange)) {
+            if (list.Value != null && list.Value.PlayerRefresh.HasFlag(ToDoList.RefreshOn.Time)) {
                 overlayDataSources.Value?.Refresh();
             }
         }

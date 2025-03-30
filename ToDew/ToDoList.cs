@@ -51,7 +51,7 @@ namespace ToDew {
         [Flags]
         public enum RefreshOn {
             Location = 1 << 0,
-            TimeChange  = 1 << 1,
+            Time  = 1 << 1,
         }
         
         /// <summary>
@@ -505,6 +505,42 @@ namespace ToDew {
             }
         }
 
+        public void SetItemGsqText(ListItem item, bool forHost, string text) {
+            if (Context.IsMainPlayer) {
+                if (forHost) {
+                    item.HostGsq = text;
+                } else {
+                    item.PlayerGsq = text;
+                }
+                item.RefreshVisibility();
+                Save();
+            } else {
+                SendToHost(MessageType.SetGsqText, new Tuple<long, bool, string>(item.Id, forHost, text));
+            }
+        }
+
+        public void SetItemGsqRefreshFlag(ListItem item, bool forHost, RefreshOn flag, bool value) {
+            if (Context.IsMainPlayer) {
+                if (forHost) {
+                    if (value) {
+                        item.HostGsqRefresh |= flag;
+                    } else {
+                        item.HostGsqRefresh &= ~flag;
+                    }
+                } else {
+                    if (value) {
+                        item.PlayerGsqRefresh |= flag;
+                    } else {
+                        item.PlayerGsqRefresh &= ~flag;
+                    }
+                }
+                item.RefreshVisibility();
+                Save();
+            } else {
+                SendToHost(MessageType.SetGsqRefreshFlag, new Tuple<long, bool, RefreshOn, bool>(item.Id, forHost, flag, value));
+            }
+        }
+
         /// <summary>
         /// Removes completed items from the list before saving, resets repeating items.
         /// </summary>
@@ -563,6 +599,8 @@ namespace ToDew {
             public const string SetWeatherFlag = "SetWeatherFlag";
             public const string SetDayOfWeekFlag = "SetDayOfWeekFlag"; // Deprecated
             public const string SetDayVisibilityFlag = "SetDayVisibilityFlag";
+            public const string SetGsqText = "SetGsqText";
+            public const string SetGsqRefreshFlag = "SetGsqRefreshFlag";
 
             // messages sent from the host
             public const string ListData = "ListData";
@@ -684,6 +722,20 @@ namespace ToDew {
                             }, t.Item1);
                             break;
                         }
+                    case MessageType.SetGsqText: {
+                        var t = e.ReadAs<Tuple<long, bool, string>>();
+                        CallWithItem("SetGsqText", (li) => {
+                            SetItemGsqText(li, t.Item2, t.Item3);
+                        }, t.Item1);
+                        break;
+                    }
+                    case MessageType.SetGsqRefreshFlag: {
+                        var t = e.ReadAs<Tuple<long, bool, RefreshOn, bool>>();
+                        CallWithItem("SetGsqRefreshFlag", (li) => {
+                            SetItemGsqRefreshFlag(li, t.Item2, t.Item3, t.Item4);
+                        }, t.Item1);
+                        break;
+                    }
                     default:
                         theMod.Monitor.Log(I18n.Message_IgnoringUnexpectedMessageType(messageType: e.Type, fromId: e.FromPlayerID, fromName: Game1.GetPlayer(e.FromPlayerID)?.Name),
                             LogLevel.Warn);

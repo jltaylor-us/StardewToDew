@@ -1,6 +1,36 @@
 
 # Release Notes
 
+## Version 2.4.0
+
+* Updated Portuguese translation from GitHub user Lumisori
+* List items can now use Game State Queries as an additional
+  visibility filter.
+
+### Game State Queries
+
+[Game State Qeuries](https://stardewvalleywiki.com/Modding:Game_state_queries)
+can be entered on the new "advanced" configuration page, accessible
+via the `...` icon.  The queries _may_ be run at any time, but are
+not guaranteed to be evaluated more often that once at the start
+of each game day unless one or more of the checkboxes indicating
+a higher refresh rate are checked.
+
+The **Host GSQ** is executed on the host (and in the context of the host
+player) in a multiplayer game and
+controls visibility for the item for all players.  The **Player GSQ**
+is executed by each player in a multiplayer game independently,
+and controls visibility for only that player.  In a single player
+game there is no functional difference, but a Host GSQ will be
+slightly more efficient.
+
+#### Example
+
+To make an item only visible in the overlay when the current
+player is on the farm, set the **Player GSQ** to
+`LOCATION_NAME Here Farm` and have it refresh on "location change".
+
+
 ## Version 2.3.0
 
 * Configuration changes now refresh the overlay list when the

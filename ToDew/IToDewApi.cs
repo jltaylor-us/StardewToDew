@@ -51,7 +51,7 @@ namespace ToDew {
     ///   The API currently contains definitions related to just one bit
     ///   of functionality:  the ability to provide items to display in
     ///   the overlay.  The overlay can display items from multiple data
-    ///   sources; the to-do list mainained by To-Dew is just one data
+    ///   sources; the to-do list maintained by To-Dew is just one data
     ///   source.
     /// </para>
     /// </summary>

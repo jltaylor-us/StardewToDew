@@ -15,7 +15,7 @@ namespace ToDew {
 
         /// <summary>The version of the data format.</summary>
         /// The data format comprises the ListData object (and any objects reachable therefrom).
-        public static readonly ISemanticVersion CurrentDataFormatVersion = new SemanticVersion(1, 2, 0);
+        public static readonly ISemanticVersion CurrentDataFormatVersion = new SemanticVersion(1, 3, 0);
 
         [Flags]
         public enum WeatherVisiblity {
@@ -33,7 +33,7 @@ namespace ToDew {
             Monday    = 0b00000010,
             Tuesday   = 0b00000100,
             Wednesday = 0b00001000,
-            Thurdsay  = 0b00010000,
+            Thursday  = 0b00010000,
             Friday    = 0b00100000,
             Saturday  = 0b01000000,
             Spring    = 0b0001_00000000,
@@ -48,6 +48,12 @@ namespace ToDew {
         }
         #pragma warning restore format
 
+        [Flags]
+        public enum RefreshOn {
+            Location = 1 << 0,
+            Time  = 1 << 1,
+        }
+        
         /// <summary>
         /// The data model for an item on the to-do list.
         /// </summary>
@@ -63,6 +69,10 @@ namespace ToDew {
             public WeatherVisiblity FarmWeatherVisiblity { get; set; }
             public WeatherVisiblity IslandWeatherVisiblity { get; set; }
             public DayVisibility DayOfWeekVisibility { get; set; }
+            public string? HostGsq { get; set; }
+            public RefreshOn HostGsqRefresh { get; set; }
+            public string? PlayerGsq { get; set; }
+            public RefreshOn PlayerGsqRefresh { get; set; }
 
             // internally-maintained state
             public int DaysUntilVisible { get; set; } = 0;
@@ -98,6 +108,9 @@ namespace ToDew {
                 weatherVisibility |= FarmWeatherVisiblity.HasFlag(farmRaining ? WeatherVisiblity.Raining : WeatherVisiblity.NotRaining);
                 weatherVisibility |= IslandWeatherVisiblity.HasFlag(islandRaining ? WeatherVisiblity.Raining : WeatherVisiblity.NotRaining);
                 IsVisibleToday = weatherVisibility && dateVisibility;
+                if (IsVisibleToday && !String.IsNullOrWhiteSpace(HostGsq)) {
+                    IsVisibleToday = GameStateQuery.CheckConditions(HostGsq);
+                }
             }
 
             internal void RefreshVisibility() {
@@ -146,9 +159,13 @@ namespace ToDew {
         public bool IncompatibleMultiplayerHost { get => _incompatibleMultiplayerHost; }
         /// <summary>The current to-do list.</summary>
         public List<ListItem> Items => theList.Items;
+        /// <summary>The union of the Host refresh rates for all items in the list</summary>
+        public RefreshOn HostRefresh { get; set; }
+        /// <summary>The union of the Player refresh rates for all items in the list</summary>
+        public RefreshOn PlayerRefresh { get; set; }
 
         /// <summary>
-        /// Construct a new to-do list, restoring state as apropriate.
+        /// Construct a new to-do list, restoring state as appropriate.
         /// </summary>
         /// If the current player is the host then read the to-do list from the current save file.
         /// If the current player is a farmhand, send a request to the host for the current list.
@@ -189,6 +206,18 @@ namespace ToDew {
         /// <summary>The event raised when the list changes.</summary>
         public event EventHandler<List<ListItem>>? OnChanged;
 
+        private void DoOnChanged() {
+            RefreshOn hostRefresh = 0;
+            RefreshOn playerRefresh = 0;
+            foreach (var item in Items) {
+                hostRefresh |= item.HostGsqRefresh;
+                playerRefresh |= item.HostGsqRefresh;
+            }
+            this.HostRefresh = hostRefresh;
+            this.PlayerRefresh = playerRefresh;
+            this.OnChanged?.Invoke(this, this.Items);
+        }
+
         private void DoAddItem(string text) {
             ListItem item = new ListItem(theMod.Helper.Multiplayer.GetNewID(), text);
             if (theMod.config.addLocation == ListAddLocation.Bottom) {
@@ -217,7 +246,7 @@ namespace ToDew {
         /// Should only be called by the main player.
         private void Save() {
             theMod.Helper.Data.WriteSaveData<ListData>(SaveKey, theList);
-            this.OnChanged?.Invoke(this, this.Items);
+            DoOnChanged();
             if (Context.IsMultiplayer) {
                 // It doesn't actually hurt to do this in single-player, but this avoids
                 // adding extra debug output to the log.
@@ -476,6 +505,42 @@ namespace ToDew {
             }
         }
 
+        public void SetItemGsqText(ListItem item, bool forHost, string text) {
+            if (Context.IsMainPlayer) {
+                if (forHost) {
+                    item.HostGsq = text;
+                } else {
+                    item.PlayerGsq = text;
+                }
+                item.RefreshVisibility();
+                Save();
+            } else {
+                SendToHost(MessageType.SetGsqText, new Tuple<long, bool, string>(item.Id, forHost, text));
+            }
+        }
+
+        public void SetItemGsqRefreshFlag(ListItem item, bool forHost, RefreshOn flag, bool value) {
+            if (Context.IsMainPlayer) {
+                if (forHost) {
+                    if (value) {
+                        item.HostGsqRefresh |= flag;
+                    } else {
+                        item.HostGsqRefresh &= ~flag;
+                    }
+                } else {
+                    if (value) {
+                        item.PlayerGsqRefresh |= flag;
+                    } else {
+                        item.PlayerGsqRefresh &= ~flag;
+                    }
+                }
+                item.RefreshVisibility();
+                Save();
+            } else {
+                SendToHost(MessageType.SetGsqRefreshFlag, new Tuple<long, bool, RefreshOn, bool>(item.Id, forHost, flag, value));
+            }
+        }
+
         /// <summary>
         /// Removes completed items from the list before saving, resets repeating items.
         /// </summary>
@@ -534,6 +599,8 @@ namespace ToDew {
             public const string SetWeatherFlag = "SetWeatherFlag";
             public const string SetDayOfWeekFlag = "SetDayOfWeekFlag"; // Deprecated
             public const string SetDayVisibilityFlag = "SetDayVisibilityFlag";
+            public const string SetGsqText = "SetGsqText";
+            public const string SetGsqRefreshFlag = "SetGsqRefreshFlag";
 
             // messages sent from the host
             public const string ListData = "ListData";
@@ -655,6 +722,20 @@ namespace ToDew {
                             }, t.Item1);
                             break;
                         }
+                    case MessageType.SetGsqText: {
+                        var t = e.ReadAs<Tuple<long, bool, string>>();
+                        CallWithItem("SetGsqText", (li) => {
+                            SetItemGsqText(li, t.Item2, t.Item3);
+                        }, t.Item1);
+                        break;
+                    }
+                    case MessageType.SetGsqRefreshFlag: {
+                        var t = e.ReadAs<Tuple<long, bool, RefreshOn, bool>>();
+                        CallWithItem("SetGsqRefreshFlag", (li) => {
+                            SetItemGsqRefreshFlag(li, t.Item2, t.Item3, t.Item4);
+                        }, t.Item1);
+                        break;
+                    }
                     default:
                         theMod.Monitor.Log(I18n.Message_IgnoringUnexpectedMessageType(messageType: e.Type, fromId: e.FromPlayerID, fromName: Game1.GetPlayer(e.FromPlayerID)?.Name),
                             LogLevel.Warn);
@@ -676,7 +757,7 @@ namespace ToDew {
                         }
                     }
                     theList = newList;
-                    this.OnChanged?.Invoke(this, this.Items);
+                    DoOnChanged();
                 } else {
                     theMod.Monitor.Log(I18n.Message_IgnoringUnexpectedMessageType(messageType: e.Type, fromId: e.FromPlayerID, fromName: Game1.GetPlayer(e.FromPlayerID)?.Name),
                         LogLevel.Warn);

@@ -182,12 +182,28 @@ namespace ToDew {
             internal readonly ToDoList.ListItem todoItem;
             internal readonly int myIndex;
             internal readonly int totalItemCount;
-            public ItemConfigMenu(ToDoMenu menu, ToDoList.ListItem todoItem, int index, int totalItemCount) {
+            public ItemConfigMenu(ToDoMenu menu, ToDoList.ListItem todoItem, int index, int totalItemCount, ItemConfigMenu? prevInstance = null) {
                 this.menu = menu;
                 this.todoItem = todoItem;
                 this.myIndex = index;
                 this.totalItemCount = totalItemCount;
+                hostGsqTextBox.limitWidth = false;
+                playerGsqTextBox.limitWidth = false;
+                if (prevInstance != null) {
+                    currentPage = prevInstance.currentPage;
+                    hostGsqTextBox = prevInstance.hostGsqTextBox;
+                    playerGsqTextBox = prevInstance.playerGsqTextBox;
+                } else {
+                    hostGsqTextBox.Text = todoItem.HostGsq;
+                    playerGsqTextBox.Text = todoItem.PlayerGsq;
+                }
             }
+
+            private enum Page {
+                Main, Advanced
+            }
+            
+            private Page currentPage = Page.Main;
 
             public bool IsFirstItem { get => myIndex == 0; }
             public bool IsLastItem { get => myIndex == totalItemCount - 1; }
@@ -195,11 +211,13 @@ namespace ToDew {
             private static readonly Rectangle okButtonSource = new Rectangle(128, 256, 64, 64);
             private static readonly Rectangle trashSource = new Rectangle(564, 102, 18, 26);
             private static readonly Rectangle trashLidSource = new Rectangle(564, 129, 18, 10);
+            private static readonly Rectangle ellipsisSource = new Rectangle(16, 144, 16, 16);
+            private static readonly Rectangle ellipsis2Source = new Rectangle(16, 176, 16, 16);
             private static readonly ToDoList.DayVisibility[] daysOfWeek = {
                 ToDoList.DayVisibility.Monday,
                 ToDoList.DayVisibility.Tuesday,
                 ToDoList.DayVisibility.Wednesday,
-                ToDoList.DayVisibility.Thurdsay,
+                ToDoList.DayVisibility.Thursday,
                 ToDoList.DayVisibility.Friday,
                 ToDoList.DayVisibility.Saturday,
                 ToDoList.DayVisibility.Sunday,
@@ -216,13 +234,20 @@ namespace ToDew {
                 ToDoList.DayVisibility.Week3,
                 ToDoList.DayVisibility.Week4,
             };
+            private static readonly ToDoList.RefreshOn[] gsqRefreshFlags = {
+                ToDoList.RefreshOn.Location,
+                ToDoList.RefreshOn.Time
+            };
 
 
             private const int margin = 5;
             private const int leftPadding = 5;
+            private int lineHeight;
             private Rectangle bounds = Rectangle.Empty;
             private Rectangle okButton = Rectangle.Empty;
+            // main options page
             private Rectangle trashCan = Rectangle.Empty;
+            private Rectangle advancedButton = Rectangle.Empty;
             private Rectangle doubleUp = Rectangle.Empty;
             private Rectangle doubleDown = Rectangle.Empty;
             private Rectangle repeatingCheckbox = Rectangle.Empty;
@@ -238,6 +263,13 @@ namespace ToDew {
             private Rectangle[] daysOfWeekCheckboxes = new Rectangle[daysOfWeek.Length];
             private Rectangle[] seasonsCheckboxes = new Rectangle[seasons.Length];
             private Rectangle[] weeksCheckboxes = new Rectangle[weeks.Length];
+            // advanced options page
+            private Rectangle backButton = Rectangle.Empty;
+            internal readonly TextBox hostGsqTextBox = new TextBox(Sprites.Textbox.Sheet, null, Game1.smallFont, Color.Black);
+            private Rectangle[] hostGsqCheckboxes = new Rectangle[gsqRefreshFlags.Length];
+            internal readonly TextBox playerGsqTextBox = new TextBox(Sprites.Textbox.Sheet, null, Game1.smallFont, Color.Black);
+            private Rectangle[] playerGsqCheckboxes = new Rectangle[gsqRefreshFlags.Length];
+            
             private string[] dayOfWeekNames = {
                 I18n.Monday(),
                 I18n.Tuesday(),
@@ -249,7 +281,13 @@ namespace ToDew {
                 I18n.Sunday(),
             };
 
+            private string[] gsqRefreshText = {
+                I18n.Menu_Edit_RefreshLocation(),
+                I18n.Menu_Edit_RefreshTime(),
+            };
+
             private const int trashScale = 3;
+            private const int ellipsisScale = 3;
             private const int checkboxScale = 3;
             private const int checkboxLabelSpace = 5;
             private const int doubleArrowOffset = 10;
@@ -268,6 +306,8 @@ namespace ToDew {
                 bounds.Height = nonScrollingHeight;
                 okButton = new Rectangle(bounds.Right - margin - okButtonSource.Width, bounds.Bottom - margin - okButtonSource.Height, okButtonSource.Width, okButtonSource.Height);
                 trashCan = new Rectangle(okButton.X, okButton.Y - trashSource.Height * trashScale - margin * 2, trashSource.Width * trashScale, trashSource.Height * trashScale);
+                advancedButton = new Rectangle(okButton.X, trashCan.Y - ellipsisSource.Height * ellipsisScale - margin * 2, ellipsisSource.Width * ellipsisScale, ellipsisSource.Height * ellipsisScale);
+                backButton = new Rectangle(okButton.X, okButton.Y - CommonSprites.Icons.LeftArrow.Height - margin * 2, CommonSprites.Icons.LeftArrow.Width, CommonSprites.Icons.LeftArrow.Height);
                 doubleUp = new Rectangle(okButton.X, bounds.Y + margin, CommonSprites.Icons.UpArrow.Width, CommonSprites.Icons.UpArrow.Height + doubleArrowOffset);
                 doubleDown = new Rectangle(okButton.X, doubleUp.Bottom + margin * 2, CommonSprites.Icons.DownArrow.Width, CommonSprites.Icons.DownArrow.Height + doubleArrowOffset);
                 int leftPx = bounds.X + margin + leftPadding;
@@ -292,7 +332,7 @@ namespace ToDew {
                 hideInOverlayCheckbox = MakeCheckboxRect(leftPx, topPx);
                 topPx += hideInOverlayCheckbox.Height + margin;
 
-                int lineHeight = (int)Game1.smallFont.MeasureString("ABC").Y;
+                lineHeight = (int)Game1.smallFont.MeasureString("ABC").Y;
                 topPx += lineHeight;
                 rainingCheckbox = MakeCheckboxRect(leftPx, topPx);
                 topPx += rainingCheckbox.Height + margin;
@@ -332,6 +372,38 @@ namespace ToDew {
                 topPx += seasonsCheckboxes[0].Height;
 
                 bounds.Height = Math.Max(nonScrollingHeight, topPx - bounds.Y);
+                
+                // ----- advanced page ------
+                leftPx = bounds.X + margin + leftPadding;
+                topPx = bounds.Y + margin;
+                int indentedLeftPx = leftPx + 30;
+                topPx += lineHeight;
+                hostGsqTextBox.X = indentedLeftPx;
+                hostGsqTextBox.Y = topPx;
+                hostGsqTextBox.Width = bounds.Width - 2 * (indentedLeftPx - bounds.X);
+                topPx += hostGsqTextBox.Height;
+                
+                int l = indentedLeftPx;
+                l += (int)Game1.smallFont.MeasureString(I18n.Menu_Edit_RefreshOn()).X;
+                for (int i = 0; i < gsqRefreshFlags.Length; i++) {
+                    hostGsqCheckboxes[i] = MakeCheckboxRect(l, topPx);
+                    l += hostGsqCheckboxes[i].Width + margin + (int)Game1.smallFont.MeasureString(gsqRefreshText[i]).X + spaceWidth;
+                }
+                topPx += hostGsqCheckboxes[0].Height;
+
+                topPx += lineHeight * 2;
+                playerGsqTextBox.X = indentedLeftPx;
+                playerGsqTextBox.Y = topPx;
+                playerGsqTextBox.Width = bounds.Width - 2 * (indentedLeftPx - bounds.X);
+                topPx += playerGsqTextBox.Height;
+                
+                l = indentedLeftPx;
+                l += (int)Game1.smallFont.MeasureString(I18n.Menu_Edit_RefreshOn()).X;
+                for (int i = 0; i < gsqRefreshFlags.Length; i++) {
+                    playerGsqCheckboxes[i] = MakeCheckboxRect(l, topPx);
+                    l += playerGsqCheckboxes[i].Width + margin + (int)Game1.smallFont.MeasureString(gsqRefreshText[i]).X + spaceWidth;
+                }
+                topPx += playerGsqCheckboxes[0].Height;
             }
             private void DrawCheckbox(SpriteBatch spriteBatch, Rectangle rect, bool isChecked, string label) {
                 spriteBatch.DrawSprite(Game1.mouseCursors, isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked, rect.X, rect.Y, null, checkboxScale);
@@ -343,6 +415,16 @@ namespace ToDew {
                     ComputeBounds(positionX, positionY, width, nonScrollingHeight);
                     prevNonScrollingHeight = nonScrollingHeight;
                 }
+                switch (currentPage) {
+                    case Page.Main:
+                        return Draw_Main(spriteBatch, positionX, positionY, width, nonScrollingHeight, mouseX, mouseY);
+                    case Page.Advanced:
+                        return Draw_Advanced(spriteBatch, positionX, positionY, width, nonScrollingHeight, mouseX, mouseY);
+                    default:
+                        throw new InvalidOperationException($"invalid value {currentPage} for currentPage");
+                }
+            }
+            private Vector2 Draw_Main(SpriteBatch spriteBatch, int positionX, int positionY, int width, int nonScrollingHeight, int mouseX, int mouseY) {
                 int topPx = bounds.Y + margin;
 
                 // checkboxes
@@ -408,6 +490,11 @@ namespace ToDew {
                     spriteBatch.DrawSprite(Game1.mouseCursors, CommonSprites.Icons.DownArrow, doubleDown.X, doubleDown.Y, null, doubleDown.Contains(mouseX, mouseY) ? 1.1f : 1.0f);
                 }
                 // trash and OK button
+                var advancedButtonSource =
+                    (String.IsNullOrWhiteSpace(todoItem.HostGsq) && String.IsNullOrWhiteSpace(todoItem.PlayerGsq))
+                        ? ellipsisSource
+                        : ellipsis2Source;
+                spriteBatch.DrawSprite(Game1.mouseCursors2, advancedButtonSource, advancedButton.X, advancedButton.Y, null, ellipsisScale + (advancedButton.Contains(mouseX, mouseY) ? 0.2f : 0.0f));
                 float trashExtraScale = trashCan.Contains(mouseX, mouseY) ? 0.2f : 0.0f;
                 spriteBatch.DrawSprite(Game1.mouseCursors, trashSource, trashCan.X, trashCan.Y, null, trashScale + trashExtraScale);
                 spriteBatch.DrawSprite(Game1.mouseCursors, trashLidSource, trashCan.X - 1 * trashScale, trashCan.Y, null, trashScale + trashExtraScale);
@@ -416,11 +503,66 @@ namespace ToDew {
                 bounds.Height = Math.Max(bounds.Height, topPx - bounds.Y);
                 return new Vector2(bounds.Width, bounds.Height);
             }
+
+            private Vector2 Draw_Advanced(SpriteBatch spriteBatch, int positionX, int positionY, int width, int nonScrollingHeight, int mouseX, int mouseY) {
+                int topPx = bounds.Y + margin;
+                int leftPx = bounds.X + margin + leftPadding;
+                int indentedLeftPx = leftPx + 30;
+                
+                spriteBatch.DrawString(Game1.smallFont, I18n.Menu_Edit_HostGsq(), new Vector2(leftPx, topPx), Color.Black);
+                hostGsqTextBox.Draw(spriteBatch);
+
+                topPx = hostGsqCheckboxes[0].Y;
+                spriteBatch.DrawString(Game1.smallFont, I18n.Menu_Edit_RefreshOn(), new Vector2(indentedLeftPx, topPx), Color.Black);
+                for (int i = 0; i < gsqRefreshFlags.Length; i++) {
+                    DrawCheckbox(spriteBatch, hostGsqCheckboxes[i], todoItem.HostGsqRefresh.HasFlag(gsqRefreshFlags[i]), gsqRefreshText[i]);
+                }
+                topPx += hostGsqCheckboxes[0].Height;
+
+                topPx += lineHeight;
+                spriteBatch.DrawString(Game1.smallFont, I18n.Menu_Edit_PlayerGsq(), new Vector2(leftPx, topPx), Color.Black);
+                playerGsqTextBox.Draw(spriteBatch);
+                
+                topPx = playerGsqCheckboxes[0].Y;
+                spriteBatch.DrawString(Game1.smallFont, I18n.Menu_Edit_RefreshOn(), new Vector2(indentedLeftPx, topPx), Color.Black);
+                for (int i = 0; i < gsqRefreshFlags.Length; i++) {
+                    DrawCheckbox(spriteBatch, playerGsqCheckboxes[i], todoItem.PlayerGsqRefresh.HasFlag(gsqRefreshFlags[i]), gsqRefreshText[i]);
+                }
+                topPx += playerGsqCheckboxes[0].Height;
+
+                spriteBatch.DrawSprite(Game1.mouseCursors, CommonSprites.Icons.LeftArrow, backButton.X, backButton.Y, null, backButton.Contains(mouseX, mouseY) ? 1.1f : 1.0f);
+                spriteBatch.DrawSprite(Game1.mouseCursors, okButtonSource, okButton.X, okButton.Y, null, okButton.Contains(mouseX, mouseY) ? 1.1f : 1.0f);
+
+                bounds.Height = Math.Max(bounds.Height, topPx - bounds.Y);
+                return new Vector2(bounds.Width, bounds.Height);
+            }
+
+            public void syncGsqText(ToDoList theList) {
+                if (!hostGsqTextBox.Text.Equals(todoItem.HostGsq)) {
+                    theList.SetItemGsqText(todoItem, true, hostGsqTextBox.Text);
+                }
+                if (!playerGsqTextBox.Text.Equals(todoItem.PlayerGsq)) {
+                    theList.SetItemGsqText(todoItem, false, playerGsqTextBox.Text);
+                }
+            }
             public void receiveClick(int mouseX, int mouseY, ToDoList theList) {
                 if (okButton.Contains(mouseX, mouseY)) {
                     menu.exitItemConfig(this);
                     return;
                 }
+
+                switch (currentPage) {
+                    case Page.Main:
+                        receiveClick_Main(mouseX, mouseY, theList);
+                        break;
+                    case Page.Advanced:
+                        receiveClick_Advanced(mouseX, mouseY, theList);
+                        break;
+                    default:
+                        throw new InvalidOperationException($"invalid value {currentPage} for currentPage");
+                }
+            }
+            private void receiveClick_Main(int mouseX, int mouseY, ToDoList theList) {
                 if (headerCheckbox.Contains(mouseX, mouseY)) {
                     theList.SetItemHeader(todoItem, !todoItem.IsHeader);
                     Game1.playSound("drumkit6");
@@ -509,6 +651,37 @@ namespace ToDew {
                     theList.DeleteItem(todoItem.Id);
                     return;
                 }
+                if (advancedButton.Contains(mouseX, mouseY)) {
+                    this.currentPage = Page.Advanced;
+                    return;
+                }
+            }
+
+            private void receiveClick_Advanced(int mouseX, int mouseY, ToDoList theList) {
+                if (backButton.Contains(mouseX, mouseY)) {
+                    this.currentPage = Page.Main;
+                    return;
+                }
+                if (hostGsqTextBox.BoundsContains(mouseX, mouseY)) {
+                    hostGsqTextBox.SelectMe();
+                    return;
+                }
+                if (playerGsqTextBox.BoundsContains(mouseX, mouseY)) {
+                    playerGsqTextBox.SelectMe();
+                    return;
+                }
+                for (int i = 0; i < gsqRefreshFlags.Length; i++) {
+                    if (hostGsqCheckboxes[i].Contains(mouseX, mouseY)) {
+                        theList.SetItemGsqRefreshFlag(todoItem, true, gsqRefreshFlags[i], !todoItem.HostGsqRefresh.HasFlag(gsqRefreshFlags[i]));
+                        Game1.playSound("drumkit6");
+                        return;
+                    }
+                    if (playerGsqCheckboxes[i].Contains(mouseX, mouseY)) {
+                        theList.SetItemGsqRefreshFlag(todoItem, false, gsqRefreshFlags[i], !todoItem.PlayerGsqRefresh.HasFlag(gsqRefreshFlags[i]));
+                        Game1.playSound("drumkit6");
+                        return;
+                    }
+                }
             }
 
         }
@@ -579,13 +752,14 @@ namespace ToDew {
             for (int i = 0; i < itemCount; i++) {
                 menuItemList.Add(new MenuItem(this, items[i], i, itemCount));
             }
-            syncCurrentlyItemEditor();
+            syncCurrentItemEditor();
         }
-        private void syncCurrentlyItemEditor() {
+        private void syncCurrentItemEditor() {
             if (currentItemEditor == null) return;
             foreach (var menuItem in menuItemList) {
                 if (menuItem.todoItem.Id == currentItemEditor.todoItem.Id) {
-                    currentItemEditor = new ItemConfigMenu(this, menuItem.todoItem, menuItem.myIndex, menuItem.totalItemCount);
+                    currentItemEditor.syncGsqText(theList);
+                    currentItemEditor = new ItemConfigMenu(this, menuItem.todoItem, menuItem.myIndex, menuItem.totalItemCount, currentItemEditor);
                     return;
                 }
             }
@@ -730,6 +904,7 @@ namespace ToDew {
             if (!closingItemEditor.todoItem.Text.Equals(Textbox.Text)) {
                 theList.SetItemText(closingItemEditor.todoItem, Textbox.Text);
             }
+            closingItemEditor.syncGsqText(theList);
             Game1.playSound("coin");
             currentItemEditor = null;
             Textbox.Text = "";
@@ -764,6 +939,9 @@ namespace ToDew {
         public override void receiveLeftClick(int x, int y, bool playSound = true) {
             const int scrollAmount = 120;
             this.forceScrollToAddLocation = false;
+            if (Textbox.BoundsContains(x, y)) {
+                Textbox.SelectMe();
+            }
             if (!contentArea.Contains(x, y)) return;
             if (scrollUpRect.Contains(x, y)) {
                 this.CurrentScroll -= scrollAmount;
@@ -834,5 +1012,12 @@ namespace ToDew {
             /// <summary>The sprite sheet containing the textbox sprites.</summary>
             public static Texture2D Sheet => Game1.content.Load<Texture2D>("LooseSprites\\textBox");
         }
+    }
+
+    internal static class Extensions {
+        internal static bool BoundsContains(this TextBox textBox, int x, int y) {
+            return new Rectangle(textBox.X, textBox.Y, textBox.Width, textBox.Height).Contains(x, y);
+        }
+        
     }
 }

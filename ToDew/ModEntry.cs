@@ -71,6 +71,8 @@ namespace ToDew {
             helper.Events.GameLoop.ReturnedToTitle += this.OnReturnedToTitle;
             helper.Events.GameLoop.Saving += onSaving;
             helper.Events.GameLoop.DayStarted += onDayStarted;
+            helper.Events.Player.Warped += onWarped;
+            helper.Events.GameLoop.TimeChanged += onTimeChanged;
         }
 
         private void onLaunched(object? sender, GameLaunchedEventArgs e) {
@@ -209,6 +211,24 @@ namespace ToDew {
 
         private void onDayStarted(object? sender, DayStartedEventArgs e) {
             list.Value?.RefreshVisibility(true);
+        }
+
+        private void onWarped(object? sender, WarpedEventArgs e) {
+            if (list.Value != null && list.Value.HostRefresh.HasFlag(ToDoList.RefreshOn.Location)) {
+                list.Value.RefreshVisibility(false);
+            }
+            if (list.Value != null && list.Value.PlayerRefresh.HasFlag(ToDoList.RefreshOn.Location)) {
+                overlayDataSources.Value?.Refresh();
+            }
+        }
+
+        private void onTimeChanged(object? sender, TimeChangedEventArgs e) {
+            if (list.Value != null && list.Value.HostRefresh.HasFlag(ToDoList.RefreshOn.Time)) {
+                list.Value.RefreshVisibility(false);
+            }
+            if (list.Value != null && list.Value.PlayerRefresh.HasFlag(ToDoList.RefreshOn.Time)) {
+                overlayDataSources.Value?.Refresh();
+            }
         }
 
         private void onSaving(object? sender, SavingEventArgs e) {

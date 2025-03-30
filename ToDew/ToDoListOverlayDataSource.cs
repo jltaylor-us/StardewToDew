@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using StardewValley;
 
 namespace ToDew {
     public class ToDoListOverlayDataSource : IToDewOverlayDataSource {
@@ -36,6 +37,8 @@ namespace ToDew {
             bool lastIsHeader = false;
             foreach (var item in theList.Items) {
                 if (item.IsDone || item.HideInOverlay || !item.IsVisibleToday) continue;
+                if (!String.IsNullOrWhiteSpace(item.PlayerGsq) &&
+                    !GameStateQuery.CheckConditions(item.PlayerGsq)) continue;
                 if (item.IsHeader) {
                     if (lastIsHeader && config.hideHeaderWithNoChildren) {
                         result.RemoveAt(result.Count - 1);

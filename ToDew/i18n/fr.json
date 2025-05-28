@@ -18,6 +18,8 @@
     "config.overlay.enabled.desc": "L'overlay est-il activé ?",
     "config.overlay.click-to-mark-done": "Cliquez sur les éléments pour\nmarquer comme terminé",
     "config.overlay.click-to-mark-done.desc": "Activer le clic dans l'overlay pour marquer les éléments comme terminés",
+    "config.overlay.hide-header-with-no-children": "Cacher les en-têtes orphelins",
+    "config.overlay.hide-header-with-no-children.desc": "Ne pas afficher un élément d'en-tête si l'élément visible suivant est également un en-tête",
     "config.overlay.hotkey": "Raccourci (overlay)",
     "config.overlay.hotkey.desc": "Touche pour afficher ou masquer l'overlay",
     "config.overlay.hide-at-festivals": "Cacher pendant les festivals",
@@ -72,6 +74,11 @@
     "menu.edit.only-days": "Jours :",
     "menu.edit.week": "Semaines :",
     "menu.edit.only-season": "Saisons :",
+    "menu.edit.host-gsq": "Hôte GSQ",
+    "menu.edit.player-gsq": "Joueur GSQ",
+    "menu.edit.refresh-on": "Rechargement sur :",
+    "menu.edit.refresh-location": "changement de lieu",
+    "menu.edit.refresh-time": "changement de temps",
 
     // full day names (since the game only has translations for the short names)
     "sunday": "Dimanche",

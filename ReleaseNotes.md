@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 2.4.2
+
+* Updated French translation from GitHub user Caranud
+* Fix typo causing player GSQ refresh rates to have no effect
+
 ## Version 2.4.1
 
 * Updated Vietnamese translation from nexusmods user Blazemc2k5

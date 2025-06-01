@@ -211,7 +211,7 @@ namespace ToDew {
             RefreshOn playerRefresh = 0;
             foreach (var item in Items) {
                 hostRefresh |= item.HostGsqRefresh;
-                playerRefresh |= item.HostGsqRefresh;
+                playerRefresh |= item.PlayerGsqRefresh;
             }
             this.HostRefresh = hostRefresh;
             this.PlayerRefresh = playerRefresh;

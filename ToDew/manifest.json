@@ -1,7 +1,7 @@
 ﻿{
     "Name": "To-Dew",
     "Author": "Jamie Taylor",
-    "Version": "2.4.1",
+    "Version": "2.4.2",
     "Description": "An in-game To-do list",
     "UniqueID": "jltaylor-us.ToDew",
     "EntryDll": "ToDew.dll",

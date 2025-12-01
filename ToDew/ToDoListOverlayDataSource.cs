@@ -44,10 +44,10 @@ namespace ToDew {
                         result.RemoveAt(result.Count - 1);
                     }
                     lastIsHeader = true;
-                    result.Add(("  " + item.Text, item.IsBold, null));
+                    result.Add((item.Text, item.IsBold, null));
                 } else {
                     lastIsHeader = false;
-                    result.Add((item.Text, item.IsBold, () => theList.SetItemDone(item, true)));
+                    result.Add(("  " + item.Text, item.IsBold, () => theList.SetItemDone(item, true)));
                     if (result.Count >= limit) break;
                 }
             }

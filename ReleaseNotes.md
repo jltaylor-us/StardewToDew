@@ -1,6 +1,14 @@
 
 # Release Notes
 
+## Version 2.5.0
+
+* Fix reversed indentation level of header and regular items
+  in the overlay
+* Add "Hide with HUD" option for the overlay.  When set, the
+  overlay will not be drawn when the HUD is not being drawn
+  (for example, when the F4 "screenshot mode" is active).
+
 ## Version 2.4.2
 
 * Updated French translation from GitHub user Caranud

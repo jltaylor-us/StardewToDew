@@ -20,6 +20,7 @@ namespace ToDew {
         public SButton hotkey = SButton.None;
         public KeybindList hotkeyList = new KeybindList();
         public bool hideAtFestivals = false;
+        public bool hideWithHud = false;
         public int maxWidth = 600;
         public int maxItems = 10;
         public Color backgroundColor = Color.Black * 0.2f;
@@ -59,6 +60,12 @@ namespace ToDew {
                 tooltip: I18n.Config_Overlay_HideAtFestivals_Desc,
                 getValue: () => getThis().hideAtFestivals,
                 setValue: (bool val) => getThis().hideAtFestivals = val);
+            api.AddBoolOption(
+                mod: modManifest,
+                name: I18n.Config_Overlay_HideWithHud,
+                tooltip: I18n.Config_Overlay_HideWithHud_Desc,
+                getValue: () => getThis().hideWithHud,
+                setValue: (bool val) => getThis().hideWithHud = val);
             api.AddNumberOption(
                 mod: modManifest,
                 name: I18n.Config_Overlay_MaxWidth,
@@ -204,7 +211,8 @@ namespace ToDew {
                 || !config.enabled // shouldn't get this far, but why not check anyway
                 || Game1.game1.takingMapScreenshot
                 || Game1.eventUp || Game1.farmEvent != null
-                || (config.hideAtFestivals && Game1.isFestival()))
+                || (config.hideAtFestivals && Game1.isFestival())
+                || (config.hideWithHud && !Game1.IsHudDrawn))
             {
                 mouseCurrentlyOverDoneButtonWithAction = null;
                 return;

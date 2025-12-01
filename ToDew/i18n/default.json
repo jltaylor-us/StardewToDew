@@ -24,6 +24,8 @@
     "config.overlay.hotkey.desc": "Hotkey to show or hide",
     "config.overlay.hide-at-festivals": "Hide at festivals",
     "config.overlay.hide-at-festivals.desc": "Hide the overlay during festivals?",
+    "config.overlay.hide-with-hud": "Hide with HUD",
+    "config.overlay.hide-with-hud.desc": "Always hide when the game's Heads Up Display is hidden",
     "config.overlay.max-width": "Max Width",
     "config.overlay.max-width.desc": "Maximum width of the overlay in pixels",
     "config.overlay.max-items": "Max Items",

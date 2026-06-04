@@ -204,6 +204,7 @@ namespace ToDew {
             }
             list.Value = new ToDoList(this);
             toDoListOverlayDataSource.Value.theList = list.Value;
+            overlay.Value?.Dispose(); // better compatibility with QuickSave
             if (config.overlay.enabled) {
                 overlay.Value = new ToDoOverlay(this, overlayDataSources.Value);
             }

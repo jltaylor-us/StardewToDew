@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 2.5.1
+
+* Fix double-rendering issues when QuickSave mode is installed.
+
 ## Version 2.5.0
 
 * Fix reversed indentation level of header and regular items

@@ -40,6 +40,8 @@
     "config.overlay.x-offset.desc": "X Offset of the overlay in pixels from the left edge of the screen",
     "config.overlay.y-offset": "Y Offset",
     "config.overlay.y-offset.desc": "Y Offset of the overlay in pixels from the top edge of the screen",
+    "config.overlay.large-font": "Large font",
+    "config.overlay.large-font.desc": "Use a larger font for the overlay",
 
     // Overlay
     "overlay.header": "To-Dew List",

@@ -26,6 +26,8 @@
     "config.overlay.x-offset.desc": "X-Offset des Overlays in Pixel vom linken Bildschirmrand",
     "config.overlay.y-offset": "Y-Offset",
     "config.overlay.y-offset.desc": "Y-Offset des Overlays in Pixel vom oberen Bildschirmrand",
+    "config.overlay.large-font": "Große schriftart",
+    "config.overlay.large-font.desc": "Verwenden sie eine große schriftart",
 
     // Überlagerung
     "overlay.header": "To-Dew List",

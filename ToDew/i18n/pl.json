@@ -34,8 +34,8 @@
     "config.overlay.zoom.desc": "Wybierz, która z opcji powiększenia w grze kontroluje rozmiar nakładki.",
     "config.overlay.x-offset": "Przesunięcie X",
     "config.overlay.x-offset.desc": "Przesunięcie X nakładki (w pikselach) od lewej krawędzi ekranu",
-    "config.overlay.y-offset": "Przesunięcie Y",
-    "config.overlay.y-offset.desc": "Przesunięcie Y nakładki (w pikselach) od górnej krawędzi ekranu",
+    "config.overlay.y-offset": "Duża czcionka",
+    "config.overlay.y-offset.desc": "Użyj dużej czcionki",
 
     // Overlay
     "overlay.header": "Lista To-Dew",

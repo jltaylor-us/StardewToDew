@@ -26,6 +26,8 @@
     "config.overlay.x-offset.desc": "叠加层距屏幕左边缘的 X 偏移量（以像素为单位）",
     "config.overlay.y-offset": "Y 偏移量",
     "config.overlay.y-offset.desc": "叠加层距屏幕上边缘的 Y 偏移量（以像素为单位）",
+    "config.overlay.large-font": "大字体",
+    "config.overlay.large-font.desc": "使用大字体",
 
     //叠加
     "overlay.header": "待办清单",

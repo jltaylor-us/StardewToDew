@@ -26,6 +26,8 @@
     "config.overlay.x-offset.desc": "Смещение по оси X наложения в пикселях от левого края экрана",
     "config.overlay.y-offset": "Смещение Y",
     "config.overlay.y-offset.desc": "Y Смещение оверлея в пикселях от верхнего края экрана",
+    "config.overlay.large-font": "Крупный шрифт",
+    "config.overlay.large-font.desc": "Используйте крупный шрифт.",
 
     // Оверлей
     "overlay.header": "Список дел",

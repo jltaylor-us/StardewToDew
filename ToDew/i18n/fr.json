@@ -38,6 +38,8 @@
     "config.overlay.x-offset.desc": "Décalage X de l'overlay en pixels à partir du bord gauche de l'écran",
     "config.overlay.y-offset": "Décalage Y",
     "config.overlay.y-offset.desc": "Décalage Y de l'overlay en pixels à partir du bord supérieur de l'écran",
+    "config.overlay.large-font": "Police de grande taille",
+    "config.overlay.large-font.desc": "Utilisez une police de grande taille",
 
     // Overlay
     "overlay.header": "Liste To-Dew",

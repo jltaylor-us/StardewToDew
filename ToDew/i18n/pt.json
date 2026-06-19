@@ -26,6 +26,8 @@
   "config.overlay.x-offset.desc": "Deslocamento X da sobreposição em pixels desde a borda esquerda da tela",
   "config.overlay.y-offset": "Deslocamento Y",
   "config.overlay.y-offset.desc": "Deslocamento Y da sobreposição em pixels desde a borda superior da tela",
+  "config.overlay.large-font": "Fonte grande",
+  "config.overlay.large-font.desc": "Use fonte grande",
 
   // Overlay
   "overlay.header": "Lista de Tarefas",

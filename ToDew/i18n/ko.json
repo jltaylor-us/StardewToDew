@@ -26,6 +26,8 @@
     "config.overlay.x-offset.desc": "X 화면 왼쪽 가장자리에서 오버레이의 오프셋(픽셀 단위)",
     "config.overlay.y-offset": "Y 오프셋",
     "config.overlay.y-offset.desc": "화면 상단 가장자리에서 오버레이의 Y 오프셋(픽셀 단위)",
+    "config.overlay.large-font": "큰 글꼴",
+    "config.overlay.large-font.desc": "큰 글꼴을 사용하세요",
 
     // Overlay
     "overlay.header": "To-Dew List",

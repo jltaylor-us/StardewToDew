@@ -38,6 +38,8 @@
     "config.overlay.x-offset.desc": "Độ lệch trục X của lớp phủ tính bằng pixel tính từ cạnh trái của màn hình",
     "config.overlay.y-offset": "Độ lệch trục Y",
     "config.overlay.y-offset.desc": "Độ lệch trục Y của lớp phủ tính bằng pixel tính từ cạnh trên của màn hình",
+    "config.overlay.large-font": "cỡ chữ lớn",
+    "config.overlay.large-font.desc": "Sử dụng cỡ chữ lớn",
 
     // Overlay
     "overlay.header": "Danh sách việc cần làm",

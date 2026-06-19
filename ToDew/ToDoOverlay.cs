@@ -28,6 +28,7 @@ namespace ToDew {
         public int offsetX = 0;
         public int offsetY = 0;
         public bool scaleWithUI = false;
+        public bool largeFont = false;
         public static void RegisterConfigMenuOptions(Func<OverlayConfig> getThis, GenericModConfigMenuAPI api, GMCMOptionsAPI? apiExt, IManifest modManifest) {
             api.AddSectionTitle(modManifest, I18n.Config_Overlay, I18n.Config_Overlay_Desc);
             api.AddBoolOption(
@@ -98,6 +99,12 @@ namespace ToDew {
                 setValue: (string val) => getThis().scaleWithUI = "OptionsPage_UIScale" == val,
                 allowedValues: new[] { "OptionsPage_UIScale", "OptionsPage.cs.11254" },
                 formatAllowedValue: (string val) => Game1.content.LoadString("Strings\\StringsFromCSFiles:" + val));
+            api.AddBoolOption(
+                mod: modManifest,
+                name: I18n.Config_Overlay_LargeFont,
+                tooltip: I18n.Config_Overlay_LargeFont_Desc,
+                getValue: () => getThis().largeFont,
+                setValue: (bool val) => getThis().largeFont = val);
             if (apiExt is not null) {
                 apiExt.AddColorOption(
                     mod: modManifest,
@@ -125,7 +132,7 @@ namespace ToDew {
         private const int marginRight = 5;
         private const int marginBottom = 5;
         private const int lineSpacing = 5;
-        private readonly SpriteFont font = Game1.smallFont;
+        private SpriteFont font { get => config.largeFont ? Game1.dialogueFont : Game1.smallFont; }
         private Rectangle bounds;
         internal record struct Line(Action? onDone, string Text, bool Bold, bool Underline, float Top, Vector2 Size, bool hasDoneButton);
         private List<Line> lines;

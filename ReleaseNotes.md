@@ -3,6 +3,7 @@
 
 ## Version 2.6.0
 
+* Add an option to use a larger font in the overlay.
 * Move the overlay down during the Desert Festival so it does
   not overlap with the egg count display.
 

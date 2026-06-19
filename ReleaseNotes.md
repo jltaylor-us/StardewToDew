@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 2.6.0
+
+* Move the overlay down during the Desert Festival so it does
+  not overlap with the egg count display.
+
 ## Version 2.5.1
 
 * Fix double-rendering issues when QuickSave mode is installed.

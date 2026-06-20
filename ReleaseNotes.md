@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 2.6.1
+
+* Improved Vietnamese translation from GitHub user bl205vn
+
 ## Version 2.6.0
 
 * Add an option to use a larger font in the overlay.

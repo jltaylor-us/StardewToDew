@@ -231,7 +231,9 @@ namespace ToDew {
             {
                 int adjust = Game1.uiMode ? (int)MathF.Ceiling(80f * Game1.options.zoomLevel / Game1.options.uiScale) : 80;
                 effectiveBounds.Y = Math.Max(effectiveBounds.Y, adjust);
-            } else if (Game1.currentLocation is DesertFestival) {
+            } else if (Game1.currentLocation is DesertFestival 
+                || (Game1.IsWinter && Game1.dayOfMonth >= 12 && Game1.dayOfMonth <= 13 && Game1.currentLocation is Beach))
+            {
                 int adjust = Game1.uiMode ? (int)MathF.Ceiling(104f * Game1.options.zoomLevel / Game1.options.uiScale) : 104;
                 effectiveBounds.Y = Math.Max(effectiveBounds.Y, adjust);
             }

@@ -1,6 +1,11 @@
 
 # Release Notes
 
+## Version 2.6.2
+
+* Move the overlay down during SquidFest so it does not
+  overlap with the squid count display.
+
 ## Version 2.6.1
 
 * Improved Vietnamese translation from GitHub user bl205vn

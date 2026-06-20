@@ -4,7 +4,8 @@
 ## Version 2.6.2
 
 * Move the overlay down during SquidFest so it does not
-  overlap with the squid count display.
+  overlap with the squid count display.  Thanks GitHub
+  user JonathanFeenstra!
 
 ## Version 2.6.1
 

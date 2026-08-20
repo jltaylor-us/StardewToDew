@@ -18,7 +18,7 @@
     "config.overlay.enabled.desc": "Czy nakładka jest włączona?",
     "config.overlay.click-to-mark-done": "Kliknij, aby wykreślić",
     "config.overlay.click-to-mark-done.desc": "Włączenie klikania w nakładce w celu oznaczenia wykonanych pozycji",
-    "config.overlay.hide-header-with-no-children": "Ukryj nagłówki bez elementów podrzędnych",
+    "config.overlay.hide-header-with-no-children": "Ukryj nagłówki bez elementów pod.",
     "config.overlay.hide-header-with-no-children.desc": "Nie wyświetlaj nagłówka, jeśli następna widoczna pozycja również jest nagłówkiem",
     "config.overlay.hotkey": "Klawisz skrótu",
     "config.overlay.hotkey.desc": "Klawisz do wyświetlania lub ukrycia nakładki w grze",

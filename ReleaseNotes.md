@@ -1,6 +1,10 @@
 
 # Release Notes
 
+## Version 2.6.3
+
+* Updated Polish translation from GitHub user marcix99942
+
 ## Version 2.6.2
 
 * Move the overlay down during SquidFest so it does not
